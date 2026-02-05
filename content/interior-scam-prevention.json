@@ -4,11 +4,16 @@
   "meta_description": "인테리어 사기 피해가 매년 증가하고 있습니다. 저가 견적 미끼, 자재 바꿔치기, 선금 잠적, 하자 보수 거부 등 대표적인 4가지 유형과 구체적인 예방법을 알려드립니다.",
   "category": "피해 예방",
   "target_keyword": "인테리어 사기",
-  "tags": ["인테리어사기", "인테리어피해", "사기예방", "인테리어주의사항"],
+  "tags": [
+    "인테리어사기",
+    "인테리어피해",
+    "사기예방",
+    "인테리어주의사항"
+  ],
   "published_at": "2026-02-06T10:00:00.000Z",
   "published": true,
-  "hero_image_local": null,
-  "hero_image": null,
+  "hero_image_local": "F:\\zipcheck_blog\\images\\interior-scam-prevention.png",
+  "hero_image": "/images/interior-scam-prevention.png",
   "body_sections": [
     {
       "type": "text",

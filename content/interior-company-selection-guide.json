@@ -4,11 +4,16 @@
   "meta_description": "인테리어 업체 선정, 어디서부터 확인해야 할지 막막하신가요? 사업자등록증부터 견적서 세부 내역, 하자 보증 조건까지 반드시 체크해야 할 5가지 핵심 항목을 정리했습니다.",
   "category": "인테리어 가이드",
   "target_keyword": "인테리어 업체 선정",
-  "tags": ["인테리어업체", "업체선정", "인테리어견적", "리모델링업체"],
+  "tags": [
+    "인테리어업체",
+    "업체선정",
+    "인테리어견적",
+    "리모델링업체"
+  ],
   "published_at": "2026-02-06T09:00:00.000Z",
   "published": true,
-  "hero_image_local": null,
-  "hero_image": null,
+  "hero_image_local": "F:\\zipcheck_blog\\images\\interior-company-selection-guide.png",
+  "hero_image": "/images/interior-company-selection-guide.png",
   "body_sections": [
     {
       "type": "text",
