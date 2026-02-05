@@ -6,14 +6,16 @@
   <title>{{title}} | 집첵 블로그</title>
   <meta name="description" content="{{meta_description}}">
   <meta name="keywords" content="{{keywords}}">
-  <link rel="canonical" href="https://blog.zcheck.co.kr/{{slug}}">
+  <link rel="canonical" href="https://blog.zcheck.co.kr/{{slug}}/">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/favicon.png">
 
   <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="{{title}}">
   <meta property="og:description" content="{{meta_description}}">
   <meta property="og:image" content="{{og_image}}">
-  <meta property="og:url" content="https://blog.zcheck.co.kr/{{slug}}">
+  <meta property="og:url" content="https://blog.zcheck.co.kr/{{slug}}/">
   <meta property="og:site_name" content="집첵 블로그">
   <meta property="og:locale" content="ko_KR">
 
@@ -46,33 +48,39 @@
       "name": "집첵",
       "url": "https://zcheck.co.kr"
     },
-    "mainEntityOfPage": "https://blog.zcheck.co.kr/{{slug}}"
+    "mainEntityOfPage": "https://blog.zcheck.co.kr/{{slug}}/"
   }
   </script>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwindConfig = { theme: { extend: {
+    tailwind.config = { theme: { extend: {
       colors: {
-        brand: { 50: '#f0f7ff', 100: '#e0effe', 200: '#bae0fd', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+        brand: { 50: '#e6f7fa', 100: '#b3e8ef', 200: '#80d9e5', 500: '#13A9BA', 600: '#11C1D5', 700: '#0e8f9e' },
         warm: { 50: '#fefce8', 100: '#fef9c3', 500: '#eab308' }
       }
     }}}
-    if (typeof tailwind !== 'undefined') tailwind.config = tailwindConfig;
   </script>
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
     body { font-family: 'Pretendard Variable', -apple-system, system-ui, sans-serif; }
-    .prose h2 { margin-top: 2rem; margin-bottom: 1rem; font-size: 1.375rem; font-weight: 700; color: #1f2937; }
-    .prose h3 { margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.125rem; font-weight: 600; color: #374151; }
-    .prose p { margin-bottom: 1rem; line-height: 1.8; color: #4b5563; }
-    .prose ul, .prose ol { margin-bottom: 1rem; padding-left: 1.5rem; color: #4b5563; }
-    .prose li { margin-bottom: 0.5rem; line-height: 1.7; }
-    .prose strong { color: #1f2937; }
-  </style>
 
-  <link rel="icon" type="image/png" href="/favicon.png">
-  <link rel="apple-touch-icon" href="/favicon.png">
+    /* Article Content — polarad 참고 */
+    .article-content { font-size: 1.0625rem; line-height: 1.85; color: #4b5563; overflow-wrap: break-word; }
+    @media (max-width: 767px) { .article-content { font-size: 1rem; } }
+    .article-content h2 { font-size: 1.5rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e5e7eb; color: #111827; }
+    .article-content h3 { font-size: 1.25rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.75rem; color: #1f2937; }
+    .article-content p { margin-bottom: 1.5rem; }
+    .article-content strong { font-weight: 600; color: #1f2937; }
+    .article-content ul, .article-content ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+    .article-content ul { list-style-type: disc; }
+    .article-content ol { list-style-type: decimal; }
+    .article-content li { margin-bottom: 0.5rem; }
+    .article-content li::marker { color: #13A9BA; }
+    .article-content blockquote { margin: 2rem 0; padding: 1.25rem 1.5rem; background: #f9fafb; border-left: 4px solid #13A9BA; border-radius: 0 0.75rem 0.75rem 0; }
+    .article-content blockquote p { margin-bottom: 0; color: #374151; }
+    .article-content img { border-radius: 0.75rem; margin: 1.5rem 0; width: 100%; height: auto; }
+  </style>
 
   <!-- GA4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z15NR826B7"></script>
@@ -89,11 +97,11 @@
   <header class="bg-white/95 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-50">
     <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
       <a href="/" class="flex items-center gap-2 no-underline">
-        <img src="/images/logo.svg" alt="집첵" class="h-6 w-auto">
+        <img src="/images/logo.png" alt="집첵" class="h-6 w-auto">
         <span class="text-sm font-medium text-gray-400 tracking-tight">블로그</span>
       </a>
       <a href="https://zcheck.co.kr" target="_blank" rel="noopener"
-         class="flex items-center gap-1 text-sm text-gray-400 hover:text-brand-600 transition-colors no-underline">
+         class="flex items-center gap-1 text-sm text-gray-400 hover:text-brand-500 transition-colors no-underline">
         <span class="hidden sm:inline">견적 분석 서비스</span>
         <span class="sm:hidden">집첵</span>
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
@@ -101,63 +109,92 @@
     </div>
   </header>
 
-  <!-- Main -->
-  <main class="max-w-3xl mx-auto px-4 py-8">
-    <!-- Article Header -->
-    <article>
-      <div class="mb-6">
-        <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
-          <span class="bg-brand-50 text-brand-600 px-2 py-0.5 rounded-full text-xs font-medium">{{category}}</span>
+  <!-- Article Header -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="max-w-3xl mx-auto px-4 py-10 md:py-14">
+      <div class="flex items-center gap-3 mb-4">
+        <a href="/" class="text-sm text-gray-400 hover:text-gray-600 no-underline">블로그</a>
+        <span class="text-gray-300">/</span>
+        <span class="text-sm text-brand-500 font-medium">{{category}}</span>
+      </div>
+      <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-5">{{title}}</h1>
+      <div class="flex items-center gap-4 text-sm text-gray-500">
+        <div class="flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
           <time datetime="{{published_at}}">{{date_display}}</time>
         </div>
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-4">{{title}}</h1>
+        <span class="text-gray-300">|</span>
+        <span>집첵 에디터</span>
       </div>
+    </div>
+  </div>
 
+  <!-- Main -->
+  <main class="max-w-3xl mx-auto px-4 py-8 md:py-12">
+    <article>
       <!-- Hero Image -->
-      <div class="rounded-xl overflow-hidden mb-8">
-        <img src="{{hero_image}}" alt="{{title}}" class="w-full h-auto" loading="eager">
+      <div class="rounded-2xl overflow-hidden mb-10 border border-gray-200">
+        <img src="{{hero_image}}" alt="{{title}}" class="w-full h-auto aspect-video object-cover" loading="eager">
       </div>
 
       <!-- Body -->
-      <div class="prose max-w-none">
+      <div class="article-content">
         {{body_html}}
       </div>
 
       <!-- Tags -->
-      <div class="mt-8 pt-6 border-t border-gray-200">
+      <div class="mt-10 pt-6 border-t border-gray-200">
         <div class="flex flex-wrap gap-2">
           {{tags_html}}
         </div>
       </div>
 
-      <!-- CTA Box -->
-      <div class="mt-10 bg-gradient-to-br from-brand-50 to-blue-50 border border-brand-200 rounded-2xl p-6 md:p-8">
-        <div class="text-center">
-          <p class="text-lg font-bold text-gray-900 mb-2">
-            인테리어 업체 중 만족스러운 곳이 있었나요?
-          </p>
-          <p class="text-gray-600 mb-5 leading-relaxed text-sm md:text-base">
-            집첵 업체후기 게시판에 경험을 남겨주세요.<br>
-            다른 분들이 인테리어 업체를 선택할 때 큰 도움이 됩니다.
-          </p>
-          <a href="https://zcheck.co.kr/reviews?utm_source=blog&utm_medium=cta&utm_campaign={{slug}}"
-             target="_blank" rel="noopener"
-             class="inline-block bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors no-underline text-sm md:text-base">
-            업체 후기 남기기
-          </a>
+      <!-- Share Buttons (카카오 제외) -->
+      <div class="mt-8 pt-6 border-t border-gray-200">
+        <p class="text-sm font-medium text-gray-700 flex items-center gap-2 mb-3">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+          공유하기
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <!-- Facebook -->
+          <button onclick="window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),'_blank','width=600,height=400')"
+                  class="p-2.5 bg-[#1877F2] text-white rounded-lg hover:opacity-80 transition-opacity" aria-label="페이스북 공유" title="페이스북 공유">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </button>
+          <!-- X (Twitter) -->
+          <button onclick="window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(document.title)+'&url='+encodeURIComponent(location.href),'_blank','width=600,height=400')"
+                  class="p-2.5 bg-black text-white rounded-lg hover:opacity-80 transition-opacity" aria-label="X 공유" title="X(트위터) 공유">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </button>
+          <!-- Link Copy -->
+          <button id="copyLinkBtn" onclick="navigator.clipboard.writeText(location.href).then(()=>{const b=document.getElementById('copyLinkBtn');b.innerHTML='<svg width=18 height=18 viewBox=\'0 0 24 24\' fill=none stroke=currentColor stroke-width=2><path d=\'M5 13l4 4L19 7\'/></svg>';b.classList.add('bg-green-500','text-white');b.classList.remove('bg-gray-100','text-gray-600');setTimeout(()=>{b.innerHTML='<svg width=18 height=18 viewBox=\'0 0 24 24\' fill=none stroke=currentColor stroke-width=2><path stroke-linecap=round stroke-linejoin=round d=\'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1\'/></svg>';b.classList.remove('bg-green-500','text-white');b.classList.add('bg-gray-100','text-gray-600')},2000)})"
+                  class="p-2.5 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-all" aria-label="링크 복사" title="링크 복사">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+          </button>
         </div>
       </div>
 
-      <!-- Related CTA -->
-      <div class="mt-6 bg-warm-50 border border-yellow-200 rounded-xl p-5">
-        <p class="text-sm text-gray-700 leading-relaxed">
-          <strong>인테리어 견적, 적정 가격인지 궁금하세요?</strong><br>
-          집첵 AI가 견적서를 분석해 공정별 적정 가격과 주의사항을 알려드립니다.
-          <a href="https://zcheck.co.kr?utm_source=blog&utm_medium=banner&utm_campaign={{slug}}"
-             target="_blank" rel="noopener" class="text-brand-600 font-semibold hover:underline ml-1">
-            무료 분석 받기 &rarr;
-          </a>
-        </p>
+      <!-- CTA Box -->
+      <div class="mt-12 bg-gradient-to-br from-brand-50 to-teal-50 border-2 border-brand-200 rounded-2xl p-6 md:p-8">
+        <div class="flex flex-col md:flex-row items-center gap-6">
+          <div class="flex-shrink-0">
+            <div class="w-14 h-14 bg-brand-100 rounded-full flex items-center justify-center">
+              <svg class="w-7 h-7 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            </div>
+          </div>
+          <div class="flex-1 text-center md:text-left">
+            <h3 class="text-lg font-bold text-gray-900 mb-1">인테리어 견적, 적정 가격인지 궁금하세요?</h3>
+            <p class="text-gray-600 text-sm">집첵이 원가 데이터를 기반으로 공정별 적정 가격과 주의사항을 알려드립니다.</p>
+          </div>
+          <div class="flex-shrink-0">
+            <a href="https://zcheck.co.kr?utm_source=blog&utm_medium=cta&utm_campaign={{slug}}"
+               target="_blank" rel="noopener"
+               class="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-700 text-white font-semibold px-5 py-3 rounded-xl transition-colors no-underline text-sm whitespace-nowrap">
+              무료 분석 받기
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+          </div>
+        </div>
       </div>
     </article>
   </main>
@@ -168,11 +205,11 @@
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         <div>
           <a href="/" class="flex items-center gap-2 no-underline mb-3">
-            <img src="/images/logo.svg" alt="집첵" class="h-5 w-auto brightness-0 invert">
+            <img src="/images/logo_white.png" alt="집첵" class="h-5 w-auto">
             <span class="text-sm font-medium text-gray-500">블로그</span>
           </a>
           <p class="text-sm text-gray-500 leading-relaxed">
-            AI 기반 인테리어 견적 분석 서비스<br>
+            원가 기반 인테리어 견적 분석 서비스<br>
             적정 가격, 집첵이 알려드립니다.
           </p>
         </div>
