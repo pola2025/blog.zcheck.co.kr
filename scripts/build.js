@@ -100,6 +100,23 @@ function buildPost(post, template) {
     }
   }
 
+  // 본문 내 이미지 복사
+  const imgDir = path.join(DIST_DIR, 'images');
+  fs.mkdirSync(imgDir, { recursive: true });
+  for (const section of post.body_sections || []) {
+    const localPath = section.local_path || section.path;
+    if (section.type === 'image' && localPath) {
+      const src = path.resolve(localPath);
+      if (fs.existsSync(src)) {
+        const ext = path.extname(src);
+        const imgName = `${slug}-${path.basename(src, ext)}${ext}`;
+        const dest = path.join(imgDir, imgName);
+        fs.copyFileSync(src, dest);
+        section.src = `/images/${imgName}`;
+      }
+    }
+  }
+
   // 본문 HTML 생성
   const bodyHtml = buildBodyHtml(post.body_sections || []);
 
@@ -145,16 +162,26 @@ function buildPost(post, template) {
   console.log(`  [POST] ${slug}/index.html`);
 }
 
+function formatInline(text) {
+  // HTML 이스케이프 먼저 적용
+  let result = esc(text);
+  // **볼드** → <strong>
+  result = result.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // ==하이라이트== → <mark>
+  result = result.replace(/==(.+?)==/g, '<mark>$1</mark>');
+  return result;
+}
+
 function buildBodyHtml(sections) {
   const parts = [];
 
   for (const section of sections) {
     switch (section.type) {
       case 'heading':
-        parts.push(`<h2>${esc(section.content)}</h2>`);
+        parts.push(`<h2>${formatInline(section.content)}</h2>`);
         break;
       case 'subheading':
-        parts.push(`<h3>${esc(section.content)}</h3>`);
+        parts.push(`<h3>${formatInline(section.content)}</h3>`);
         break;
       case 'text':
         // 줄바꿈을 <br>로 변환, 문단 단위로 <p> 래핑
@@ -162,7 +189,7 @@ function buildBodyHtml(sections) {
         for (const p of paragraphs) {
           const trimmed = p.trim();
           if (trimmed) {
-            parts.push(`<p>${esc(trimmed).replace(/\n/g, '<br>')}</p>`);
+            parts.push(`<p>${formatInline(trimmed).replace(/\n/g, '<br>')}</p>`);
           }
         }
         break;
@@ -170,13 +197,126 @@ function buildBodyHtml(sections) {
         if (section.items) {
           parts.push('<ul>');
           for (const item of section.items) {
-            parts.push(`  <li>${esc(item)}</li>`);
+            parts.push(`  <li>${formatInline(item)}</li>`);
           }
           parts.push('</ul>');
         }
         break;
       case 'image':
-        // 자체 블로그에서는 hero만 사용, 추가 이미지는 생략
+        if (section.src) {
+          const alt = esc(section.alt || section.caption || '');
+          parts.push(`<figure>`);
+          parts.push(`  <img src="${esc(section.src)}" alt="${alt}" loading="lazy">`);
+          if (section.caption) {
+            parts.push(`  <figcaption class="text-center text-sm text-gray-500 mt-2">${esc(section.caption)}</figcaption>`);
+          }
+          parts.push(`</figure>`);
+        }
+        break;
+      case 'checklist':
+        parts.push('<div class="zc-checklist">');
+        if (section.title) {
+          parts.push(`  <div class="zc-checklist-title">✅ ${esc(section.title)}</div>`);
+        }
+        if (section.items) {
+          parts.push('  <ul>');
+          for (const item of section.items) {
+            parts.push(`    <li>${esc(item)}</li>`);
+          }
+          parts.push('  </ul>');
+        }
+        parts.push('</div>');
+        break;
+      case 'tip':
+        parts.push('<div class="zc-tip">');
+        parts.push(`  <div class="zc-tip-title">💡 ${esc(section.title || '알아두세요')}</div>`);
+        parts.push(`  <p>${esc(section.content || '').replace(/\n/g, '<br>')}</p>`);
+        parts.push('</div>');
+        break;
+      case 'warning':
+        parts.push('<div class="zc-warning">');
+        parts.push(`  <div class="zc-warning-title">⚠️ ${esc(section.title || '주의')}</div>`);
+        parts.push(`  <p>${esc(section.content || '').replace(/\n/g, '<br>')}</p>`);
+        parts.push('</div>');
+        break;
+      case 'step':
+        parts.push('<div class="zc-steps">');
+        if (section.steps) {
+          for (let i = 0; i < section.steps.length; i++) {
+            const step = section.steps[i];
+            parts.push('<div class="zc-step">');
+            parts.push(`  <div class="zc-step-num">${i + 1}</div>`);
+            parts.push('  <div class="zc-step-body">');
+            if (step.title) parts.push(`    <strong>${esc(step.title)}</strong>`);
+            if (step.content) parts.push(`    <p>${esc(step.content).replace(/\n/g, '<br>')}</p>`);
+            parts.push('  </div>');
+            parts.push('</div>');
+          }
+        }
+        parts.push('</div>');
+        break;
+      case 'highlight':
+        parts.push('<div class="zc-highlight">');
+        parts.push(`  <p>${esc(section.content || '').replace(/\n/g, '<br>')}</p>`);
+        parts.push('</div>');
+        break;
+      case 'table':
+        parts.push('<div class="zc-table">');
+        parts.push('<table>');
+        if (section.headers) {
+          parts.push('<thead><tr>');
+          for (const h of section.headers) {
+            parts.push(`  <th>${esc(h)}</th>`);
+          }
+          parts.push('</tr></thead>');
+        }
+        if (section.rows) {
+          parts.push('<tbody>');
+          for (const row of section.rows) {
+            parts.push('<tr>');
+            for (const cell of row) {
+              parts.push(`  <td>${esc(cell)}</td>`);
+            }
+            parts.push('</tr>');
+          }
+          parts.push('</tbody>');
+        }
+        parts.push('</table>');
+        parts.push('</div>');
+        break;
+      case 'keypoints':
+        parts.push('<div class="zc-keypoints">');
+        parts.push('  <div class="zc-keypoints-header">');
+        parts.push('    <div class="zc-keypoints-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>');
+        parts.push(`    <span class="zc-keypoints-label">${esc(section.title || '핵심 포인트 요약')}</span>`);
+        parts.push('  </div>');
+        if (section.points) {
+          parts.push('  <div class="zc-keypoints-grid">');
+          for (let i = 0; i < section.points.length; i++) {
+            const pt = section.points[i];
+            parts.push('    <div class="zc-keypoint-card">');
+            parts.push(`      <div class="zc-keypoint-num">${i + 1}</div>`);
+            parts.push('      <div class="zc-keypoint-body">');
+            parts.push(`        <strong>${formatInline(pt.title || '')}</strong>`);
+            if (pt.desc) parts.push(`        <span>${formatInline(pt.desc)}</span>`);
+            parts.push('      </div>');
+            parts.push('    </div>');
+          }
+          parts.push('  </div>');
+        }
+        parts.push('</div>');
+        break;
+      case 'callout':
+        parts.push('<div class="zc-callout">');
+        parts.push('  <div class="zc-callout-accent"></div>');
+        parts.push('  <div class="zc-callout-inner">');
+        parts.push(`    <div class="zc-callout-emoji">${section.emoji || '💡'}</div>`);
+        parts.push('    <div class="zc-callout-content">');
+        if (section.title) parts.push(`      <strong>${formatInline(section.title)}</strong>`);
+        if (section.content) parts.push(`      <p>${formatInline(section.content).replace(/\n/g, '<br>')}</p>`);
+        parts.push('    </div>');
+        parts.push('  </div>');
+        parts.push('</div>');
         break;
     }
   }
@@ -205,17 +345,15 @@ function buildIndex(posts) {
         const dateStr = `${pubDate.getFullYear()}.${String(pubDate.getMonth() + 1).padStart(2, '0')}.${String(pubDate.getDate()).padStart(2, '0')}`;
 
         return `
-      <a href="/${esc(post.slug)}/" class="block bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all overflow-hidden no-underline group">
-        <div class="flex flex-col sm:flex-row">
-          ${post.hero_image ? `<div class="sm:w-48 h-40 sm:h-auto overflow-hidden flex-shrink-0"><img src="${esc(post.hero_image)}" alt="${esc(post.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"></div>` : ''}
-          <div class="p-4 sm:p-5 flex-1">
-            <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
-              <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">${esc(post.category || '가이드')}</span>
-              <time>${dateStr}</time>
-            </div>
-            <h2 class="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">${esc(post.title)}</h2>
-            <p class="text-sm text-gray-500 line-clamp-2">${esc(post.meta_description || '')}</p>
+      <a href="/${esc(post.slug)}/" class="block bg-white rounded-xl border border-gray-200 hover:border-brand-200 hover:shadow-lg transition-all overflow-hidden no-underline group">
+        ${post.hero_image ? `<div class="aspect-video overflow-hidden"><img src="${esc(post.hero_image)}" alt="${esc(post.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy"></div>` : '<div class="aspect-video bg-gray-100 flex items-center justify-center"><svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>'}
+        <div class="p-4">
+          <div class="flex items-center gap-2 text-xs text-gray-500 mb-2.5">
+            <span class="bg-brand-50 text-brand-500 px-2 py-0.5 rounded-full font-medium">${esc(post.category || '가이드')}</span>
+            <time>${dateStr}</time>
           </div>
+          <h2 class="text-base font-bold text-gray-900 group-hover:text-brand-500 transition-colors mb-2 line-clamp-2 leading-snug">${esc(post.title)}</h2>
+          <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed">${esc(post.meta_description || '')}</p>
         </div>
       </a>`;
       })
@@ -245,7 +383,7 @@ function buildSitemap(posts) {
   }
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemascorp/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.join('\n')}
 </urlset>`;
 
