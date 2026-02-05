@@ -1,0 +1,14 @@
+{
+  "name": "zcheck-blog",
+  "version": "1.0.0",
+  "description": "ZCheck 자체 블로그 (blog.zcheck.co.kr) - Cloudflare Pages 정적 사이트",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "deploy": "node scripts/deploy.js",
+    "dev": "node scripts/build.js && npx serve dist -l 3000",
+    "new-post": "node scripts/create-post.js"
+  },
+  "keywords": [],
+  "author": "ZCheck",
+  "license": "ISC"
+}
