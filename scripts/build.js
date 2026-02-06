@@ -152,6 +152,7 @@ function buildPost(post, template) {
     '{{category}}': esc(post.category || '인테리어 가이드'),
     '{{body_html}}': bodyHtml,
     '{{tags_html}}': tagsHtml,
+    '{{cta_primary}}': buildCtaPrimary(post.category, slug),
   };
 
   for (const [key, value] of Object.entries(replacements)) {
@@ -389,6 +390,56 @@ ${urls.join('\n')}
 
   fs.writeFileSync(path.join(DIST_DIR, 'sitemap.xml'), sitemap, 'utf-8');
   console.log('  [SITEMAP] sitemap.xml');
+}
+
+/**
+ * 카테고리에 따라 다른 CTA HTML 생성
+ * - Type A (가이드/견적 등): 업체후기 CTA → zcheck.co.kr/reviews
+ * - Type B (피해/사기/예방): 피해사례 CTA → report.zcheck.co.kr
+ */
+function buildCtaPrimary(category, slug) {
+  const cat = (category || '').toLowerCase();
+  const isTypeB = /피해|사기|예방/.test(cat);
+
+  if (isTypeB) {
+    return `<div class="mt-12 bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200 rounded-2xl p-5 md:p-8">
+        <div class="text-center">
+          <div class="w-12 h-12 md:w-14 md:h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <svg class="w-6 h-6 md:w-7 md:h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          </div>
+          <h3 class="text-base md:text-lg font-bold text-gray-900 mb-2" style="text-wrap:balance;word-break:keep-all">비슷한 피해를 경험하셨나요?</h3>
+          <p class="text-gray-600 text-sm mb-4 leading-relaxed mx-auto px-2" style="text-wrap:pretty;word-break:keep-all">
+            인테리어 피해사례를 공유해 주시면<br>다른 분들이 같은 피해를 예방할 수 있습니다.
+          </p>
+          <a href="https://report.zcheck.co.kr?utm_source=blog&utm_medium=cta&utm_campaign=${esc(slug)}"
+             target="_blank" rel="noopener"
+             class="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors no-underline text-sm">
+            피해사례 공유하기
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </a>
+        </div>
+      </div>`;
+  }
+
+  // Type A (기본): 업체후기 CTA
+  return `<div class="mt-12 bg-gradient-to-br from-brand-50 to-teal-50 border-2 border-brand-200 rounded-2xl p-5 md:p-8">
+        <div class="text-center">
+          <div class="w-12 h-12 md:w-14 md:h-14 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <svg class="w-6 h-6 md:w-7 md:h-7 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          </div>
+          <h3 class="text-base md:text-lg font-bold text-gray-900 mb-2" style="text-wrap:balance;word-break:keep-all">인테리어 업체 중 만족스러운 곳이 있었나요?</h3>
+          <p class="text-gray-600 text-sm mb-4 leading-relaxed mx-auto px-2" style="text-wrap:pretty;word-break:keep-all">
+            집첵 업체후기 게시판에 경험을 남겨주세요.
+            다른 분들의 업체 선택에 큰 도움이 됩니다.
+          </p>
+          <a href="https://zcheck.co.kr/reviews?utm_source=blog&utm_medium=cta&utm_campaign=${esc(slug)}"
+             target="_blank" rel="noopener"
+             class="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors no-underline text-sm">
+            업체 후기 남기기
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </a>
+        </div>
+      </div>`;
 }
 
 function copyDir(src, dest) {
