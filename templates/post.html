@@ -152,6 +152,16 @@
     gtag('js', new Date());
     gtag('config', 'G-Z15NR826B7');
   </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        regs.forEach(function(r) { r.unregister(); });
+      });
+      caches.keys().then(function(names) {
+        names.forEach(function(n) { caches.delete(n); });
+      });
+    }
+  </script>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
