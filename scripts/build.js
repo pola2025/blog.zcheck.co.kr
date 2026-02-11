@@ -117,8 +117,8 @@ function buildPost(post, template) {
     }
   }
 
-  // 본문 HTML 생성
-  const bodyHtml = buildBodyHtml(post.body_sections || []);
+  // 본문 HTML 생성 (raw_html 필드가 있으면 직접 사용)
+  const bodyHtml = post.raw_html || buildBodyHtml(post.body_sections || []);
 
   // 태그 HTML
   const tagsHtml = (post.tags || [])
