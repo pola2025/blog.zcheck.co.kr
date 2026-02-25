@@ -1,6 +1,9 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    { "source": "/blog/:path*", "destination": "/:path*" }
+  ],
   "crons": [
     {
       "path": "/api/cron/publish-social",
