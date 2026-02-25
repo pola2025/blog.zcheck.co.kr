@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram Caption Preview - 집첵</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+  body { font-family: 'Noto Sans KR', sans-serif; background: #fafafa; }
+  .ig-card { max-width: 420px; }
+  .caption-text { white-space: pre-wrap; word-break: keep-all; font-size: 14px; line-height: 1.6; }
+  .char-count { font-variant-numeric: tabular-nums; }
+  .hashtags { color: #00376b; }
+  .copy-btn:active { transform: scale(0.95); }
+</style>
+</head>
+<body class="p-4 md:p-8">
+
+<div class="max-w-5xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">Instagram Caption Preview</h1>
+    <p class="text-gray-500 text-sm">4개 포스트 | 자체완결형 캡션 | 2,200자 이내</p>
+    <div class="mt-3 flex gap-2 flex-wrap">
+      <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">블로그 링크 유도 제거</span>
+      <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">핵심 정보 자체 전달</span>
+      <span class="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full">프로필 링크 소프트 CTA</span>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Post 1 -->
+    <div class="ig-card bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="bg-gradient-to-r from-gray-900 to-gray-700 p-4 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">1</div>
+        <div>
+          <div class="text-white font-medium text-sm">remodeling-checklist-2026</div>
+          <div class="text-gray-400 text-xs">아파트 리모델링 견적</div>
+        </div>
+        <div class="ml-auto">
+          <span class="char-count text-xs px-2 py-1 rounded-full" id="count1">0자</span>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-full bg-gray-200"></div>
+          <span class="text-sm font-semibold">zipcheck2025</span>
+        </div>
+        <div class="caption-text text-gray-800" id="caption1">아파트 리모델링 견적, 이것만 확인하면 돈 아낄 수 있어요
+
+견적서 3곳에서 받았는데
+어떤 걸 기준으로 비교해야 할지 모르겠다고요?
+총액만 보면 안 됩니다.
+항목별로 하나씩 뜯어봐야 해요.
+
+---
+
+1. 자재 브랜드와 모델명 확인
+견적서에 '국산 상급'이라고만 적혀 있으면 위험 신호예요.
+업체마다 기준이 다르거든요.
+브랜드명 + 모델명을 반드시 명시해달라고 하세요.
+같은 '타일 공사'도 어떤 제품을 쓰느냐에 따라
+가격이 2~3배 차이 나요.
+
+2. 시공 범위가 어디까지인지 확인
+견적에 철거비가 포함인지, 폐기물 처리는 별도인지,
+전기/배관은 기본인지 추가 옵션인지.
+이 부분에서 분쟁이 가장 많이 생깁니다.
+'일식 OOO만원' 같은 뭉뚱그린 표기가 있으면
+세부 내역을 반드시 요청하세요.
+
+3. 하자 보증을 서면으로 받기
+구두 약속은 의미 없어요.
+최소 1년 이상 하자 보증을 계약서에 넣으세요.
+공사 끝나고 문제 생기면 "그건 사용자 과실"이라며
+빠지는 업체가 정말 많거든요.
+
+4. 최소 3곳 비교 견적은 필수
+같은 평수, 같은 범위라도 업체마다 가격이 달라요.
+총액 비교가 아니라 항목별 단가를 비교해야
+어디가 비싼 건지 정확히 보입니다.
+
+---
+
+꼼꼼하게 확인하는 게
+결국 수백만 원을 아끼는 방법이에요.
+더 자세한 항목별 비교 가이드는
+프로필 링크에서 확인할 수 있어요.
+
+#아파트리모델링 #인테리어견적 #리모델링비용 #아파트인테리어 #인테리어체크리스트 #리모델링견적비교 #집첵 #인테리어</div>
+      </div>
+    </div>
+
+    <!-- Post 2 -->
+    <div class="ig-card bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="bg-gradient-to-r from-gray-900 to-gray-700 p-4 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold">2</div>
+        <div>
+          <div class="text-white font-medium text-sm">interior-company-selection-guide</div>
+          <div class="text-gray-400 text-xs">인테리어 업체 선정</div>
+        </div>
+        <div class="ml-auto">
+          <span class="char-count text-xs px-2 py-1 rounded-full" id="count2">0자</span>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-full bg-gray-200"></div>
+          <span class="text-sm font-semibold">zipcheck2025</span>
+        </div>
+        <div class="caption-text text-gray-800" id="caption2">인테리어 업체, 이 5가지 안 보면 후회해요
+
+검색하면 업체가 수십 곳인데
+어떤 기준으로 골라야 할지 감이 안 잡히시죠?
+블로그 후기만 보고 고르면 위험합니다.
+
+아래 5가지만 확인해도
+부실 업체를 거의 걸러낼 수 있어요.
+
+---
+
+1. 사업자등록증 + 실내건축업 등록
+기본 중의 기본인데 의외로 많이 놓쳐요.
+국세청 홈택스에서 사업자번호 검색하면
+지금 영업 중인지 바로 확인됩니다.
+미등록 업체랑 계약하면 문제 생겼을 때
+법적 보호를 받기 어려워요.
+
+2. 실제 시공 사례 before/after 확인
+홈페이지 예쁜 사진만 믿으면 안 돼요.
+가능하면 시공 완료된 현장 방문을 요청하세요.
+포트폴리오가 아예 없거나
+사진이 지나치게 보정되어 있으면 의심해봐야 해요.
+
+3. 견적서 세부 내역 비교
+총액만 비교하면 함정에 빠지기 쉬워요.
+'도배 공사 일식 200만원'만 적혀 있으면
+어떤 벽지를 몇 롤 쓰는지 알 수가 없거든요.
+자재 브랜드, 모델명, 수량, 단가가
+모두 기재된 견적서를 요구하세요.
+
+4. 계약서 + 하자 보증 서면화
+하자 보증은 최소 1년 이상 서면으로.
+대금은 공정률에 따라 분할 지급하면
+중간에 문제가 생겨도 대응하기 수월해요.
+구두 약속은 효력이 없습니다.
+
+5. 온라인 리뷰 중 부정 후기에 주목
+긍정 후기보다 부정 후기를 보세요.
+문제가 생겼을 때 업체가 어떻게 대응했는지가
+그 업체의 진짜 실력이에요.
+
+---
+
+체크리스트 하나만 챙겨도
+후회 없는 선택을 할 수 있습니다.
+
+#인테리어업체 #업체선정 #인테리어견적 #리모델링업체 #인테리어체크리스트 #업체비교 #집첵 #인테리어</div>
+      </div>
+    </div>
+
+    <!-- Post 3 -->
+    <div class="ig-card bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="bg-gradient-to-r from-gray-900 to-gray-700 p-4 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white text-xs font-bold">3</div>
+        <div>
+          <div class="text-white font-medium text-sm">interior-scam-prevention</div>
+          <div class="text-gray-400 text-xs">인테리어 사기 예방</div>
+        </div>
+        <div class="ml-auto">
+          <span class="char-count text-xs px-2 py-1 rounded-full" id="count3">0자</span>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-full bg-gray-200"></div>
+          <span class="text-sm font-semibold">zipcheck2025</span>
+        </div>
+        <div class="caption-text text-gray-800" id="caption3">인테리어 사기, 이렇게 당합니다 (유형 4가지)
+
+"이 가격에 이 정도 시공이요?"
+너무 좋은 견적에 바로 계약했다가
+낭패 보는 분들이 정말 많아요.
+
+흔한 유형 4가지와 예방법을 알려드릴게요.
+
+---
+
+1. 저가 견적 미끼 후 추가 비용 폭탄
+처음에 눈에 띄게 저렴한 견적을 제시해요.
+그런데 공사가 시작되면 "벽체 보강이 필요합니다"
+"이 부분은 기본 시공에 포함 안 됩니다" 하면서
+추가 비용이 하나둘 붙기 시작해요.
+최종 금액이 처음의 1.5~2배까지 올라가는 경우도 흔해요.
+
+예방: '일식' 같은 뭉뚱그린 견적 거르세요.
+항목별 단가가 명확한 견적서만 신뢰하세요.
+
+2. 자재 바꿔치기
+견적서엔 'LG하우시스 고급 마루'인데
+실제로는 이름 모를 저가 자재를 시공해요.
+자재 입고 시 포장지 브랜드를 직접 확인하고
+사진을 찍어두세요.
+계약서에 '자재 변경 시 서면 동의 필수' 조항 꼭 넣으세요.
+
+3. 선금 받고 잠적 (가장 위험)
+계약금 50~70%를 받고 연락을 끊어버려요.
+찾아가 보면 사무실은 비어있고 번호도 바뀌어 있어요.
+
+예방: 계약금은 총 공사비의 10~20%만.
+중도금은 공정률에 맞춰 단계별 지급.
+잔금은 하자 점검 후 지급이 원칙이에요.
+
+4. 하자 보수 거부
+입주 후 벽지 들뜸, 타일 균열, 수전 누수가 생겨도
+"사용자 과실" "보증 기간 지남" 하면서 보수를 거부해요.
+심하면 전화를 안 받거나 폐업해버리기도 해요.
+
+예방: 하자 보증 기간과 범위를 계약서에 명확히 기재.
+잔금은 하자 점검이 완료된 후에 지급하세요.
+
+---
+
+업체가 제시한 견적이 적정한지 궁금하다면
+프로필 링크에서 확인해 보세요.
+
+#인테리어사기 #인테리어피해 #사기예방 #인테리어주의사항 #인테리어견적 #리모델링사기 #집첵 #인테리어</div>
+      </div>
+    </div>
+
+    <!-- Post 4 -->
+    <div class="ig-card bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="bg-gradient-to-r from-gray-900 to-gray-700 p-4 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white text-xs font-bold">4</div>
+        <div>
+          <div class="text-white font-medium text-sm">remodeling-meeting-preparation</div>
+          <div class="text-gray-400 text-xs">업체 미팅 준비</div>
+        </div>
+        <div class="ml-auto">
+          <span class="char-count text-xs px-2 py-1 rounded-full" id="count4">0자</span>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-full bg-gray-200"></div>
+          <span class="text-sm font-semibold">zipcheck2025</span>
+        </div>
+        <div class="caption-text text-gray-800" id="caption4">인테리어 업체 미팅, 이거 안 챙기면 견적부터 망해요
+
+업체 미팅은 단순 상담이 아니에요.
+뭘 준비해 가느냐에 따라
+받아보는 견적의 수준이 완전히 달라집니다.
+
+빈손으로 가서 얘기만 듣고 온 적 있다면
+이번엔 이렇게 준비해 보세요.
+
+---
+
+1. 평면도와 공간 치수 가져가기
+관리사무소에서 분양 도면을 받거나
+직접 줄자로 가로, 세로, 높이를 측정해서 메모하세요.
+도면이 있으면 업체가 정확한 물량과 범위를 계산할 수 있어요.
+없으면 대충 감으로 견적을 내게 되고
+나중에 추가 비용이 생길 가능성이 높아요.
+
+2. 스타일 레퍼런스 사진 10~15장
+"깔끔하게 해주세요"만으로는
+업체마다 완전히 다른 결과물이 나와요.
+오늘의집, 핀터레스트에서 마음에 드는 사진을 저장하세요.
+바닥재, 벽면 컬러, 조명까지 세부적일수록 좋아요.
+
+3. 예산 범위 정해서 알려주기
+"3,000~3,500만원 사이" 이런 식으로
+최소~최대 범위를 전달하세요.
+예산을 안 알려주면 업체도 방향을 못 잡아서
+내 상황과 안 맞는 견적이 나오기 쉬워요.
+전체가 부담이면 주방, 욕실, 거실 순으로
+우선순위를 정해서 알려주세요.
+
+4. 업체에 물어볼 질문 리스트
+설명만 듣고 돌아오면 비교가 안 돼요.
+이건 꼭 물어보세요:
+- 예상 공사 기간
+- 대금 지급 방식
+- 하자 보증 기간과 범위
+- 공사 중 설계 변경 가능 여부
+- 현장 관리 담당자 상주 여부
+
+5. 현재 집 하자 사진 촬영
+곰팡이, 결로, 바닥 들뜸, 수압 문제 등
+기존 문제를 스마트폰으로 찍어가세요.
+구두 설명보다 사진 한 장이 훨씬 정확하고
+보수 방법까지 포함한 견적을 받을 수 있어요.
+
+---
+
+최소 3곳 이상 미팅해서 비교하는 걸 추천해요.
+한 곳만 만나면 기준이 없어 판단이 어렵거든요.
+
+#인테리어미팅 #리모델링준비 #인테리어상담 #업체미팅준비 #인테리어견적 #미팅체크리스트 #집첵 #인테리어</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Summary -->
+  <div class="mt-8 bg-white rounded-2xl border border-gray-200 p-6">
+    <h2 class="font-bold text-lg mb-4 text-gray-900">Caption 구조 비교</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-200">
+            <th class="text-left py-2 pr-4 text-gray-500 font-medium">#</th>
+            <th class="text-left py-2 pr-4 text-gray-500 font-medium">제목</th>
+            <th class="text-left py-2 pr-4 text-gray-500 font-medium">글자수</th>
+            <th class="text-left py-2 pr-4 text-gray-500 font-medium">구조</th>
+            <th class="text-left py-2 text-gray-500 font-medium">CTA</th>
+          </tr>
+        </thead>
+        <tbody id="summaryTable">
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-6 p-4 bg-gray-50 rounded-xl">
+      <h3 class="font-semibold text-sm text-gray-700 mb-2">변경 포인트</h3>
+      <ul class="text-sm text-gray-600 space-y-1">
+        <li>- 이전: "블로그에서 확인하세요" 유도 (270자)</li>
+        <li>- 이후: 핵심 정보를 캡션 안에서 전부 전달 (800~1,200자)</li>
+        <li>- 프로필 링크 언급은 마지막에 한 줄로 소프트하게</li>
+        <li>- 해시태그 8개 (기존 6개 → 주제별 2개 추가)</li>
+        <li>- 번호 리스트 + 구분선(---)으로 가독성 확보</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+// Character count
+document.querySelectorAll('[id^="caption"]').forEach((el) => {
+  const num = el.id.replace('caption', '');
+  const countEl = document.getElementById('count' + num);
+  const len = el.textContent.length;
+  countEl.textContent = len + '자';
+  if (len > 2200) {
+    countEl.className += ' bg-red-100 text-red-700';
+  } else if (len > 1800) {
+    countEl.className += ' bg-yellow-100 text-yellow-700';
+  } else {
+    countEl.className += ' bg-green-100 text-green-700';
+  }
+});
+
+// Summary table
+const captions = [
+  { id: 1, title: '리모델링 견적 체크리스트', structure: 'Hook → 4개 항목 → 마무리', cta: '프로필 링크 가이드' },
+  { id: 2, title: '인테리어 업체 선정 5가지', structure: 'Hook → 5개 항목 → 마무리', cta: '체크리스트 활용' },
+  { id: 3, title: '인테리어 사기 유형 4가지', structure: 'Hook → 4개 유형+예방 → 마무리', cta: '프로필 링크 견적 확인' },
+  { id: 4, title: '업체 미팅 준비 5가지', structure: 'Hook → 5개 준비물 → 마무리', cta: '3곳 비교 추천' },
+];
+
+const tbody = document.getElementById('summaryTable');
+captions.forEach((c) => {
+  const len = document.getElementById('caption' + c.id).textContent.length;
+  const color = len > 2200 ? 'text-red-600' : len > 1800 ? 'text-yellow-600' : 'text-green-600';
+  tbody.innerHTML += `<tr class="border-b border-gray-100">
+    <td class="py-2 pr-4 font-medium">${c.id}</td>
+    <td class="py-2 pr-4">${c.title}</td>
+    <td class="py-2 pr-4 ${color} font-medium">${len}자</td>
+    <td class="py-2 pr-4 text-gray-500">${c.structure}</td>
+    <td class="py-2 text-gray-500">${c.cta}</td>
+  </tr>`;
+});
+</script>
+
+</body>
+</html>

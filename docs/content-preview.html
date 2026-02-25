@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZCheck 소셜 미디어 콘텐츠 미리보기</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, 'Pretendard', system-ui, sans-serif; background: #f5f5f5; }
+  .threads-line { position: absolute; left: 19px; top: 48px; bottom: 0; width: 2px; background: #e0e0e0; }
+  .threads-post:last-child .threads-line { display: none; }
+  .ig-caption { white-space: pre-wrap; word-break: break-word; }
+  .tab-btn.active { border-color: #000; color: #000; font-weight: 600; }
+  .tab-btn { border-bottom: 2px solid transparent; color: #999; cursor: pointer; padding: 10px 20px; transition: all 0.2s; }
+  .post-tab.active { background: #000; color: #fff; }
+  .post-tab { background: #e5e7eb; color: #6b7280; cursor: pointer; padding: 6px 16px; border-radius: 999px; font-size: 13px; transition: all 0.2s; }
+</style>
+</head>
+<body>
+<div class="max-w-2xl mx-auto px-4 py-8">
+
+  <!-- Header -->
+  <div class="text-center mb-8">
+    <div class="inline-flex items-center gap-2 mb-3">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:#13A9BA">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+      </div>
+      <h1 class="text-xl font-bold">소셜 미디어 콘텐츠 미리보기</h1>
+    </div>
+    <p class="text-gray-500 text-sm">발행 전 Threads / Instagram 콘텐츠 확인</p>
+  </div>
+
+  <!-- Post selector -->
+  <div class="flex gap-2 justify-center mb-6 flex-wrap" id="post-selector"></div>
+
+  <!-- Platform tabs -->
+  <div class="flex justify-center border-b border-gray-200 mb-6 bg-white rounded-t-xl">
+    <button class="tab-btn active" onclick="showPlatform('threads', this)">
+      <span class="flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.5 12.068V11.5h3.5v.568c0 2.776.635 4.97 1.886 6.52 1.216 1.507 3.063 2.33 5.493 2.412h.007c5.21 0 8.114-4.062 8.114-8.924 0-4.958-2.819-8.076-7.364-8.076-1.586 0-2.98.396-4.14 1.176-1.137.765-2.03 1.849-2.655 3.223l-.09.197H3.07l.072-.295C4.238 3.545 7.703.5 12.75.5 18.508.5 23 5.174 23 11.076c0 6.076-4.308 11.424-10.814 12.924z"/></svg>
+        Threads
+      </span>
+    </button>
+    <button class="tab-btn" onclick="showPlatform('instagram', this)">
+      <span class="flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        Instagram
+      </span>
+    </button>
+  </div>
+
+  <!-- Content area -->
+  <div id="content-area"></div>
+
+</div>
+
+<script>
+const DATA = [
+  {
+    title: "아파트 리모델링 견적 비교 체크리스트",
+    slug: "remodeling-checklist-2026",
+    category: "인테리어",
+    heroLocal: "F:\\zcheck-content-pipeline\\images\\img1.png",
+    threads: [
+      "아파트 리모델링 견적 비교 체크리스트\n\n아파트 리모델링을 준비하고 계신가요? 업체마다 견적이 천차만별이라 어디서부터 비교해야 할지 막막하신 분이 많습니다. 오늘은 아파트 리모델링 견적을 받기 전에 반드시 확인해야 할 항목들을 정리해 드리겠습니다.\n\nhttps://blog.zcheck.co.kr/remodeling-checklist-2026/",
+      "⚠️ 자재 등급 표기 주의\n\n'국산 상급', '수입산 고급' 같은 모호한 표현은 업체마다 기준이 다릅니다. 반드시 브랜드명 + 모델명 + 등급을 명시해달라고 요청하세요.",
+      "1. 자재 브랜드·모델명 확인\n   → 브랜드명과 모델명이 견적서에 명확히 기재되어 있는지 반드시 확인\n\n2. 시공 범위 명확히 구분\n   → 철거비, 폐기물 처리비, 전기·배관 포함 여부를 항목별로 체크\n\n3. 하자 보증 서면 계약\n   → 최소 1년 이상 하자 보증을 서면으로 약속받을 것\n\n4. 3곳 이상 비교 견적\n   → 총액이 아닌 항목별 단가를 기준으로 비교해야 정확",
+      "이 글이 도움이 되셨다면, 인테리어 업체 경험을 후기로 남겨주세요.\n다른 분들의 업체 선택에 큰 도움이 됩니다.\n\n전체 글 보기: https://blog.zcheck.co.kr/remodeling-checklist-2026/"
+    ],
+    igCaption: "아파트 리모델링 견적 비교 체크리스트\n\n아파트 리모델링을 준비하고 계신가요? 업체마다 견적이 천차만별이라 어디서부터 비교해야 할지 막막하신 분이 많습니다. 오늘은 아파트 리모델링 견적을 받기 전에 반드시 확인해야 할 항목들을 정리해 드리겠습니다.\n\n1. 자재 브랜드·모델명 확인\n2. 시공 범위 명확히 구분\n3. 하자 보증 서면 계약\n4. 3곳 이상 비교 견적\n\n인테리어 업체 경험을 후기로 남겨주세요.\n\n전체 글 보기: https://blog.zcheck.co.kr/remodeling-checklist-2026/\n\n#아파트리모델링 #인테리어견적 #리모델링비용 #아파트인테리어 #집첵 #인테리어",
+    igImage: "https://blog.zcheck.co.kr/images/remodeling-checklist-2026.png",
+  },
+  {
+    title: "인테리어 업체 선정 시 확인해야 할 5가지",
+    slug: "interior-company-selection-guide",
+    category: "인테리어 가이드",
+    heroLocal: "F:\\zipcheck_blog\\images\\interior-company-selection-guide.png",
+    threads: [
+      "인테리어 업체 선정 시 확인해야 할 5가지\n\n인테리어 업체 선정, 어디서부터 확인해야 할지 막막하신가요? 사업자등록증부터 견적서 세부 내역, 하자 보증 조건까지 반드시 체크해야 할 5가지 핵심 항목을 정리했습니다.\n\nhttps://blog.zcheck.co.kr/interior-company-selection-guide/",
+      "⚠️ 저가 견적 사기 주의\n\n시세보다 20~30% 이상 저렴한 견적을 제시하는 업체는 주의하세요. 계약 후 '추가 공사'를 명목으로 비용을 올리거나, 저가 자재를 사용하고 고급 자재비를 청구하는 사례가 빈번합니다. 원가 기반으로 적정 시세를 미리 파악해 두면 이런 피해를 예방할 수 있습니다.",
+      "1. 사업자등록 및 면허 확인\n   → 국세청 홈택스에서 사업자번호 조회, 실내건축업 등록 여부 확인\n\n2. 실제 시공 사례 확인\n   → 홈페이지 사진만 믿지 말고 before/after 사진과 현장 방문 요청\n\n3. 견적서 항목별 세부 내역\n   → 총액이 아닌 자재 브랜드, 모델명, 수량, 단가 기준으로 비교\n\n4. 계약서 + 하자 보증 서면화\n   → 공사 범위, 기간, 대금 분할 지급, 하자 보증 1년 이상 서면 계약\n\n5. 온라인 리뷰 부정 후기 확인\n   → 문제 발생 시 업체 대응 방식을 중심으로 리뷰 확인",
+      "이 글이 도움이 되셨다면, 인테리어 업체 경험을 후기로 남겨주세요.\n다른 분들의 업체 선택에 큰 도움이 됩니다.\n\n전체 글 보기: https://blog.zcheck.co.kr/interior-company-selection-guide/"
+    ],
+    igCaption: "인테리어 업체 선정 시 확인해야 할 5가지\n\n인테리어 업체 선정, 어디서부터 확인해야 할지 막막하신가요? 사업자등록증부터 견적서 세부 내역, 하자 보증 조건까지 반드시 체크해야 할 5가지 핵심 항목을 정리했습니다.\n\n1. 사업자등록 및 면허 확인\n2. 실제 시공 사례 확인\n3. 견적서 항목별 세부 내역\n4. 계약서 + 하자 보증 서면화\n5. 온라인 리뷰 부정 후기 확인\n\n인테리어 업체 경험을 후기로 남겨주세요.\n\n전체 글 보기: https://blog.zcheck.co.kr/interior-company-selection-guide/\n\n#인테리어업체 #업체선정 #인테리어견적 #리모델링업체 #집첵 #인테리어",
+    igImage: "https://blog.zcheck.co.kr/images/interior-company-selection-guide.png",
+  },
+  {
+    title: "인테리어 사기 피해 유형 4가지와 예방법",
+    slug: "interior-scam-prevention",
+    category: "피해 예방",
+    heroLocal: "F:\\zipcheck_blog\\images\\interior-scam-prevention.png",
+    threads: [
+      "인테리어 사기 피해 유형 4가지와 예방법\n\n인테리어 사기 피해가 매년 증가하고 있습니다. 저가 견적 미끼, 자재 바꿔치기, 선금 잠적, 하자 보수 거부 등 대표적인 4가지 유형과 구체적인 예방법을 알려드립니다.\n\nhttps://blog.zcheck.co.kr/interior-scam-prevention/",
+      "🚨 자재 바꿔치기 확인 방법\n\n자재 입고 시 현장에서 직접 포장지의 브랜드명·모델명을 확인하고 사진을 찍어두세요. 견적서에 기재된 자재와 다르면 즉시 시공 중단을 요청할 권리가 있습니다. 계약서에 '자재 변경 시 사전 서면 동의 필수' 조항을 반드시 넣으세요.",
+      "1. 저가 견적 미끼 주의\n   → 유독 저렴한 견적은 추가 비용 폭탄의 전조. 항목별 단가를 꼼꼼히 비교하세요.\n\n2. 자재 현장 확인 필수\n   → 자재 입고 시 포장지의 브랜드·모델명을 직접 확인하고 사진으로 기록하세요.\n\n3. 선금은 최소한으로\n   → 계약금 10~20%, 중도금은 공정률 기준, 잔금은 하자 점검 후 지급이 원칙입니다.\n\n4. 하자 보증 서면 계약\n   → 최소 1년 이상 하자 보증을 서면으로 약속받고 점검 체크리스트를 작성하세요.",
+      "비슷한 경험이 있으신가요?\n\n인테리어 피해사례를 공유해 주시면 다른 분들이 같은 피해를 예방할 수 있습니다.\n\n전체 글 보기: https://blog.zcheck.co.kr/interior-scam-prevention/"
+    ],
+    igCaption: "인테리어 사기 피해 유형 4가지와 예방법\n\n인테리어 사기 피해가 매년 증가하고 있습니다. 저가 견적 미끼, 자재 바꿔치기, 선금 잠적, 하자 보수 거부 등 대표적인 4가지 유형과 구체적인 예방법을 알려드립니다.\n\n1. 저가 견적 미끼 주의\n2. 자재 현장 확인 필수\n3. 선금은 최소한으로\n4. 하자 보증 서면 계약\n\n인테리어 피해사례를 공유해 주세요.\n\n전체 글 보기: https://blog.zcheck.co.kr/interior-scam-prevention/\n\n#인테리어사기 #인테리어피해 #사기예방 #인테리어주의사항 #집첵 #인테리어",
+    igImage: "https://blog.zcheck.co.kr/images/interior-scam-prevention.png",
+  }
+];
+
+let currentPost = 0;
+let currentPlatform = 'threads';
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function linkify(text) {
+  return esc(text).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" class="text-blue-500 hover:underline">$1</a>');
+}
+
+function nl2br(text) {
+  return linkify(text).replace(/\n/g, '<br>');
+}
+
+function renderPostSelector() {
+  const el = document.getElementById('post-selector');
+  el.innerHTML = DATA.map((d, i) => {
+    const short = d.title.length > 20 ? d.title.substring(0, 18) + '...' : d.title;
+    return `<button class="post-tab ${i === currentPost ? 'active' : ''}" onclick="selectPost(${i})">${i+1}. ${esc(short)}</button>`;
+  }).join('');
+}
+
+function selectPost(i) {
+  currentPost = i;
+  renderPostSelector();
+  render();
+}
+
+function showPlatform(platform, btn) {
+  currentPlatform = platform;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function renderThreads(post) {
+  const labels = ['메인 포스트', '답글 1', '답글 2', '답글 3', '답글 4', '답글 5'];
+  return `
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.5 12.068V11.5h3.5v.568c0 2.776.635 4.97 1.886 6.52 1.216 1.507 3.063 2.33 5.493 2.412h.007c5.21 0 8.114-4.062 8.114-8.924 0-4.958-2.819-8.076-7.364-8.076-1.586 0-2.98.396-4.14 1.176-1.137.765-2.03 1.849-2.655 3.223l-.09.197H3.07l.072-.295C4.238 3.545 7.703.5 12.75.5 18.508.5 23 5.174 23 11.076c0 6.076-4.308 11.424-10.814 12.924z"/></svg>
+        <span class="font-semibold text-sm">@zipcheck2025</span>
+        <span class="text-gray-400 text-xs ml-auto">${post.threads.length}개 포스트</span>
+      </div>
+      <div class="p-4 space-y-0">
+        ${post.threads.map((text, i) => `
+          <div class="threads-post relative ${i > 0 ? 'ml-0' : ''}">
+            <div class="flex gap-3">
+              <div class="flex-shrink-0 relative">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background: ${i === 0 ? '#13A9BA' : '#e5e7eb'}; color: ${i === 0 ? '#fff' : '#6b7280'}">
+                  ${i === 0 ? '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.5 12.068V11.5h3.5v.568c0 2.776.635 4.97 1.886 6.52 1.216 1.507 3.063 2.33 5.493 2.412h.007c5.21 0 8.114-4.062 8.114-8.924 0-4.958-2.819-8.076-7.364-8.076-1.586 0-2.98.396-4.14 1.176-1.137.765-2.03 1.849-2.655 3.223l-.09.197H3.07l.072-.295C4.238 3.545 7.703.5 12.75.5 18.508.5 23 5.174 23 11.076c0 6.076-4.308 11.424-10.814 12.924z"/></svg>' : '#' + (i)}
+                </div>
+                ${i < post.threads.length - 1 ? '<div class="threads-line"></div>' : ''}
+              </div>
+              <div class="flex-1 pb-6 ${i < post.threads.length - 1 ? '' : 'pb-2'}">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-semibold text-sm">zipcheck2025</span>
+                  <span class="text-xs px-1.5 py-0.5 rounded-full ${i===0 ? 'bg-teal-50 text-teal-700' : 'bg-gray-100 text-gray-500'}">${labels[i] || '답글 '+i}</span>
+                  <span class="text-gray-400 text-xs ml-auto">${text.length}자</span>
+                </div>
+                <div class="text-sm text-gray-800 leading-relaxed">${nl2br(text)}</div>
+                ${i === 0 ? '<div class="flex gap-4 mt-3 text-gray-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg></div>' : ''}
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function renderInstagram(post) {
+  return `
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden max-w-md mx-auto">
+      <!-- Header -->
+      <div class="flex items-center gap-3 px-4 py-3">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background:#13A9BA">
+          <span class="text-white text-xs font-bold">Z</span>
+        </div>
+        <div>
+          <div class="font-semibold text-sm">zipcheck2025</div>
+          <div class="text-xs text-gray-400">${esc(post.category)}</div>
+        </div>
+      </div>
+      <!-- Image -->
+      <div class="aspect-square bg-gray-100 relative overflow-hidden">
+        <img src="${post.igImage}" alt="" class="w-full h-full object-cover"
+             onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-full text-gray-300\\' ><svg class=\\'w-16 h-16\\' fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'1\\' d=\\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z\\'/></svg></div>'">
+      </div>
+      <!-- Actions -->
+      <div class="flex gap-4 px-4 py-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+        <svg class="w-6 h-6 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+      </div>
+      <!-- Caption -->
+      <div class="px-4 pb-4">
+        <div class="text-xs text-gray-400 mb-2">${post.igCaption.length}자</div>
+        <div class="text-sm ig-caption leading-relaxed">${nl2br(post.igCaption)}</div>
+      </div>
+    </div>`;
+}
+
+function render() {
+  const post = DATA[currentPost];
+  const el = document.getElementById('content-area');
+  if (currentPlatform === 'threads') {
+    el.innerHTML = renderThreads(post);
+  } else {
+    el.innerHTML = renderInstagram(post);
+  }
+}
+
+renderPostSelector();
+render();
+</script>
+</body>
+</html>

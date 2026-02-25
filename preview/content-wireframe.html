@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>콘텐츠 와이어프레임 미리보기</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, "Noto Sans KR", sans-serif;
+        background: #f0f0f0;
+        color: #222;
+      }
+
+      /* 상단 헤더 */
+      .header {
+        background: #1a1a1a;
+        color: #fff;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .header h1 {
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .badge {
+        background: #333;
+        border-radius: 4px;
+        padding: 3px 8px;
+        font-size: 11px;
+        color: #aaa;
+      }
+      .badge.ok {
+        background: #1a3a1a;
+        color: #4caf50;
+      }
+      .badge.warn {
+        background: #3a2a00;
+        color: #ffc107;
+      }
+
+      /* 3컬럼 레이아웃 */
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 380px 380px;
+        gap: 16px;
+        padding: 16px;
+        max-width: 1600px;
+        margin: 0 auto;
+        align-items: start;
+      }
+
+      /* 공통 카드 */
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .card-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .card-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .platform-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-blog {
+        background: #4f46e5;
+      }
+      .dot-ig {
+        background: linear-gradient(
+          135deg,
+          #f09433,
+          #e6683c,
+          #dc2743,
+          #cc2366,
+          #bc1888
+        );
+      }
+      .dot-threads {
+        background: #000;
+      }
+
+      /* ── 블로그 뷰 ── */
+      .blog-wrap {
+        padding: 0;
+      }
+      .blog-hero {
+        width: 100%;
+        height: 240px;
+        background: #e8e4f8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .blog-hero-inner {
+        text-align: center;
+        padding: 20px;
+      }
+      .blog-hero-label {
+        font-size: 11px;
+        color: #888;
+        margin-bottom: 8px;
+        display: block;
+      }
+      .blog-hero-prompt {
+        font-size: 10px;
+        color: #666;
+        line-height: 1.5;
+        max-width: 480px;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px dashed #bbb;
+        text-align: left;
+      }
+      .blog-hero-model {
+        font-size: 10px;
+        color: #4f46e5;
+        font-weight: 600;
+        margin-top: 6px;
+      }
+      .blog-content {
+        padding: 24px;
+      }
+      .blog-meta {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .blog-cat {
+        font-size: 11px;
+        color: #4f46e5;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .blog-date {
+        font-size: 11px;
+        color: #aaa;
+      }
+      .blog-title {
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1.35;
+        margin-bottom: 12px;
+      }
+      .blog-desc {
+        font-size: 13px;
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+      }
+      .blog-tags {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+      }
+      .blog-tag {
+        font-size: 11px;
+        background: #f0effe;
+        color: #4f46e5;
+        padding: 3px 8px;
+        border-radius: 20px;
+      }
+
+      /* 블로그 섹션 */
+      .section {
+        margin-bottom: 20px;
+      }
+      .section-text {
+        font-size: 14px;
+        line-height: 1.85;
+        color: #333;
+        white-space: pre-line;
+      }
+      .section-text mark {
+        background: #fef9c3;
+        padding: 0 2px;
+        font-style: normal;
+      }
+      .section-text strong {
+        font-weight: 700;
+      }
+      .section-heading {
+        font-size: 17px;
+        font-weight: 700;
+        margin: 24px 0 10px;
+        color: #111;
+      }
+      .callout {
+        background: #fff8e1;
+        border-left: 3px solid #ffc107;
+        padding: 12px 16px;
+        border-radius: 0 8px 8px 0;
+        margin: 4px 0;
+      }
+      .callout-title {
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .callout-body {
+        font-size: 12px;
+        color: #555;
+        line-height: 1.6;
+      }
+      .callout.tip {
+        background: #e8f5e9;
+        border-color: #4caf50;
+      }
+      .keypoints {
+        background: #f8f7ff;
+        border-radius: 10px;
+        padding: 16px;
+        margin: 4px 0;
+      }
+      .keypoints-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #4f46e5;
+        margin-bottom: 12px;
+      }
+      .kp-item {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .kp-num {
+        width: 22px;
+        height: 22px;
+        background: #4f46e5;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .kp-title {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .kp-desc {
+        font-size: 12px;
+        color: #666;
+        line-height: 1.5;
+      }
+
+      /* ── 인스타그램 뷰 ── */
+      .ig-wrap {
+        padding: 16px;
+      }
+      .ig-phone {
+        background: #fafafa;
+        border: 1px solid #dbdbdb;
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .ig-topbar {
+        background: #fff;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 1px solid #efefef;
+      }
+      .ig-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f09433, #dc2743, #bc1888);
+      }
+      .ig-username {
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .ig-verified {
+        font-size: 10px;
+        color: #3897f0;
+      }
+      .ig-image-box {
+        width: 100%;
+        aspect-ratio: 1/1;
+        background: #e8e4f8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-top: 1px solid #efefef;
+        border-bottom: 1px solid #efefef;
+      }
+      .ig-image-inner {
+        text-align: center;
+        padding: 16px;
+      }
+      .ig-image-label {
+        font-size: 10px;
+        color: #888;
+        display: block;
+        margin-bottom: 6px;
+      }
+      .ig-image-prompt {
+        font-size: 9px;
+        color: #666;
+        line-height: 1.5;
+        max-width: 280px;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px dashed #ccc;
+        text-align: left;
+      }
+      .ig-image-model {
+        font-size: 9px;
+        color: #e6683c;
+        font-weight: 600;
+        margin-top: 4px;
+      }
+      .ig-actions {
+        padding: 8px 14px;
+        display: flex;
+        gap: 12px;
+        background: #fff;
+      }
+      .ig-action {
+        font-size: 18px;
+        color: #262626;
+      }
+      .ig-caption {
+        padding: 10px 14px 16px;
+        background: #fff;
+      }
+      .ig-caption-text {
+        font-size: 11px;
+        line-height: 1.65;
+        color: #262626;
+        white-space: pre-line;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .ig-caption-text .hashtag {
+        color: #3897f0;
+      }
+
+      /* ── 스레드 뷰 ── */
+      .th-wrap {
+        padding: 16px;
+      }
+      .th-chain {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .th-post {
+        display: flex;
+        gap: 12px;
+        position: relative;
+        padding: 14px 0;
+      }
+      .th-post:not(:last-child)::before {
+        content: "";
+        position: absolute;
+        left: 16px;
+        top: 46px;
+        bottom: 0;
+        width: 2px;
+        background: #e0e0e0;
+      }
+      .th-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #111;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .th-body {
+        flex: 1;
+      }
+      .th-name {
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .th-text {
+        font-size: 12px;
+        line-height: 1.65;
+        color: #111;
+        white-space: pre-line;
+      }
+      .th-text a {
+        color: #0066cc;
+      }
+      .th-num {
+        font-size: 10px;
+        background: #111;
+        color: #fff;
+        border-radius: 10px;
+        padding: 2px 7px;
+        margin-right: 6px;
+      }
+
+      /* 반응형 */
+      @media (max-width: 1100px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>콘텐츠 와이어프레임 미리보기</h1>
+      <span class="badge">interior-company-selection-test</span>
+      <span class="badge ok">Blog ✓</span>
+      <span class="badge ok">Instagram ✓</span>
+      <span class="badge ok">Threads ✓</span>
+      <span class="badge ok">이미지 생성완료 (Gemini 689KB)</span>
+    </div>
+
+    <div class="grid">
+      <!-- ── 블로그 ── -->
+      <div class="card">
+        <div class="card-header">
+          <span class="platform-dot dot-blog"></span>
+          <span class="card-title">Blog · blog.zcheck.co.kr</span>
+        </div>
+        <div class="blog-wrap">
+          <div class="blog-hero" style="height: auto; background: #000">
+            <img
+              src="interior-company-selection-test.png"
+              style="width: 100%; display: block"
+              alt="hero"
+            />
+          </div>
+          <div class="blog-content">
+            <div class="blog-meta">
+              <span class="blog-cat">인테리어 가이드</span>
+              <span class="blog-date">2026.02.25</span>
+            </div>
+            <div class="blog-title">아파트 인테리어 업체 선정 기준</div>
+            <div class="blog-desc">
+              아파트 인테리어 업체를 고를 때 반드시 확인해야 할 선정 기준을
+              정리했습니다. 면허 확인, 포트폴리오 검증, 견적서 비교, 계약서
+              체크, 사후관리까지 한 번에 확인하세요.
+            </div>
+            <div class="blog-tags">
+              <span class="blog-tag">#아파트인테리어</span>
+              <span class="blog-tag">#인테리어업체선정</span>
+              <span class="blog-tag">#리모델링견적</span>
+              <span class="blog-tag">#인테리어계약</span>
+            </div>
+
+            <div class="section">
+              <div class="section-text">
+                아파트 인테리어를 준비할 때 가장 먼저 막히는 지점은 예쁜
+                디자인보다 <mark>어떤 업체를 선택하느냐</mark>입니다. 같은
+                30평대 공사라도 업체마다 제안 방식, 견적 구조, 시공 품질,
+                사후관리 수준이 크게 다르기 때문에 처음 기준을 잘 잡아야 예산과
+                일정, 결과물까지 안정적으로 가져갈 수 있습니다. 이번 글에서는
+                광고 문구가 아니라 실제로 계약 전에 확인해야 할
+                <strong>아파트 인테리어 업체 선정 기준</strong>을 순서대로
+                정리해 드리겠습니다.
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-heading">
+                1. 등록·면허·보험: 기본 신뢰도부터 확인
+              </div>
+              <div class="section-text">
+                첫 상담 전에 반드시 확인할 것은 사업자등록 상태와 실내건축 관련
+                등록 여부입니다. 업체명이 알려져 있어도 실제 계약 주체가 다른
+                경우가 있어 계약서상 상호, 사업자번호, 대표자명이 일치하는지
+                꼼꼼히 보셔야 합니다.
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-heading">
+                2. 포트폴리오: 우리 집과 비슷한 조건 사례가 있는지
+              </div>
+              <div class="section-text">
+                포트폴리오는 사진의 분위기보다
+                <mark>내 집과 유사한 조건의 시공 경험</mark>이 핵심입니다.
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-heading">
+                3. 견적서: 총액보다 항목의 투명성을 비교
+              </div>
+              <div class="section-text">
+                업체 선정에서 가장 중요한 기준은 견적서의
+                <mark>세부 항목 투명성</mark>입니다.
+              </div>
+            </div>
+
+            <div class="callout">
+              <div class="callout-title">⚠️ 저가 견적의 전형적 패턴</div>
+              <div class="callout-body">
+                시세보다 과도하게 낮은 견적은 계약 이후 옵션 추가, 자재
+                다운그레이드, 일정 지연으로 보전하는 경우가 많습니다. 반드시
+                세부 내역과 추가금 기준을 먼저 확인하고 비교하세요.
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-heading">
+                4. 계약 조건: 일정·대금·하자보수 기준을 문서화
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-heading">
+                5. 소통 방식: 담당자 일관성과 응답 속도 점검
+              </div>
+            </div>
+
+            <div class="keypoints">
+              <div class="keypoints-title">아파트 인테리어 업체 선정 핵심</div>
+              <div class="kp-item">
+                <div class="kp-num">1</div>
+                <div>
+                  <div class="kp-title">기본 자격 검증</div>
+                  <div class="kp-desc">
+                    사업자 정보, 등록·면허, 보험 여부를 계약 주체 기준으로 확인
+                  </div>
+                </div>
+              </div>
+              <div class="kp-item">
+                <div class="kp-num">2</div>
+                <div>
+                  <div class="kp-title">유사 사례 중심 포트폴리오</div>
+                  <div class="kp-desc">
+                    우리 집과 비슷한 평형·구조·공사 조건의 실제 시공 경험을 검토
+                  </div>
+                </div>
+              </div>
+              <div class="kp-item">
+                <div class="kp-num">3</div>
+                <div>
+                  <div class="kp-title">견적서 투명성 비교</div>
+                  <div class="kp-desc">
+                    총액이 아닌 항목별 수량·단가·포함/별도·추가금 기준으로 판단
+                  </div>
+                </div>
+              </div>
+              <div class="kp-item">
+                <div class="kp-num">4</div>
+                <div>
+                  <div class="kp-title">계약서 문서화 수준</div>
+                  <div class="kp-desc">
+                    일정, 대금 지급, 공정 변경, 하자보수 절차를 서면으로 명확히
+                    합의
+                  </div>
+                </div>
+              </div>
+              <div class="kp-item">
+                <div class="kp-num">5</div>
+                <div>
+                  <div class="kp-title">소통 체계 점검</div>
+                  <div class="kp-desc">
+                    담당자 일관성, 응답 정확도, 회의 기록 방식이 안정적인 업체를
+                    선택
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 인스타그램 ── -->
+      <div class="card">
+        <div class="card-header">
+          <span
+            class="platform-dot"
+            style="
+              background: linear-gradient(135deg, #f09433, #dc2743, #bc1888);
+            "
+          ></span>
+          <span class="card-title">Instagram · @zipcheck</span>
+        </div>
+        <div class="ig-wrap">
+          <div class="ig-phone">
+            <div class="ig-topbar">
+              <div class="ig-avatar"></div>
+              <div>
+                <div class="ig-username">zipcheck_official</div>
+                <div class="ig-verified">집첵 · 인테리어 정보</div>
+              </div>
+            </div>
+            <div
+              class="ig-image-box"
+              style="background: #000; aspect-ratio: 1/1; overflow: hidden"
+            >
+              <img
+                src="interior-company-selection-test.png"
+                style="width: 100%; height: 100%; object-fit: cover"
+                alt="ig"
+              />
+            </div>
+            <div class="ig-actions">
+              <span class="ig-action">🤍</span>
+              <span class="ig-action">💬</span>
+              <span class="ig-action">✈️</span>
+            </div>
+            <div class="ig-caption">
+              <div class="ig-caption-text">
+                아파트 인테리어 업체 선정 기준 아파트 인테리어를 준비할 때 가장
+                먼저 막히는 지점은 예쁜 디자인보다 어떤 업체를 선택하느냐입니다.
+                --- 1. 기본 자격 검증 첫 상담 전에 반드시 확인할 것은 사업자등록
+                상태와 실내건축 관련 등록 여부입니다. 업체명이 알려져 있어도
+                실제 계약 주체가 다른 경우가 있어 계약서상 상호, 사업자번호,
+                대표자명이 일치하는지 꼼꼼히 보셔야 합니다. 2. 유사 사례 중심
+                포트폴리오 포트폴리오는 사진의 분위기보다 내 집과 유사한 조건의
+                시공 경험이 핵심입니다. 3. 견적서 투명성 비교 업체 선정에서 가장
+                중요한 기준은 견적서의 세부 항목 투명성입니다. 4. 계약서 문서화
+                수준 계약서에서는 공사 범위만 보지 말고 일정 지연, 공정 변경,
+                하자보수의 기준을 먼저 보셔야 합니다. 5. 소통 체계 점검 아파트
+                인테리어는 공사 기간 내내 작은 결정이 반복되는 프로젝트입니다.
+                --- 꼼꼼하게 확인하는 게 결국 수백만 원을 아끼는 방법이에요.
+
+                <span class="hashtag"
+                  >#아파트인테리어 #인테리어업체선정 #리모델링견적 #인테리어계약
+                  #집첵 #인테리어</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 스레드 ── -->
+      <div class="card">
+        <div class="card-header">
+          <span class="platform-dot dot-threads"></span>
+          <span class="card-title">Threads · 답글 체인</span>
+        </div>
+        <div class="th-wrap">
+          <div class="th-chain">
+            <div class="th-post">
+              <div class="th-avatar">Z</div>
+              <div class="th-body">
+                <div class="th-name">
+                  <span class="th-num">1</span>zipcheck_official
+                </div>
+                <div class="th-text">
+                  아파트 인테리어 업체 선정 기준 아파트 인테리어 업체를 고를 때
+                  반드시 확인해야 할 선정 기준을 정리했어. 면허 확인, 포트폴리오
+                  검증, 견적서 비교, 계약서 체크, 사후관리까지 한 번에 확인해.
+
+                  <a
+                    >https://blog.zcheck.co.kr/interior-company-selection-test/</a
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="th-post">
+              <div class="th-avatar">Z</div>
+              <div class="th-body">
+                <div class="th-name">
+                  <span class="th-num">2</span>zipcheck_official
+                </div>
+                <div class="th-text">
+                  ⚠️ 저가 견적의 전형적 패턴 시세보다 과도하게 낮은 견적은 계약
+                  이후 옵션 추가, 자재 다운그레이드, 일정 지연으로 보전하는
+                  경우가 많아. 반드시 세부 내역과 추가금 기준을 먼저 확인하고
+                  비교해.
+                </div>
+              </div>
+            </div>
+
+            <div class="th-post">
+              <div class="th-avatar">Z</div>
+              <div class="th-body">
+                <div class="th-name">
+                  <span class="th-num">3</span>zipcheck_official
+                </div>
+                <div class="th-text">
+                  1. 기본 자격 검증 → 사업자 정보, 등록·면허, 보험 여부를 계약
+                  주체 기준으로 확인 2. 유사 사례 중심 포트폴리오 → 우리 집과
+                  비슷한 평형·구조·공사 조건의 실제 시공 경험을 검토 3. 견적서
+                  투명성 비교 → 총액이 아닌 항목별 수량·단가·포함/별도·추가금
+                  기준으로 판단 4. 계약서 문서화 수준 → 일정, 대금 지급, 공정
+                  변경, 하자보수 절차를 서면으로 명확히 합의 5. 소통 체계 점검 →
+                  담당자 일관성, 응답 정확도, 회의 기록 방식이 안정적인 업체를
+                  선택
+                </div>
+              </div>
+            </div>
+
+            <div class="th-post">
+              <div class="th-avatar">Z</div>
+              <div class="th-body">
+                <div class="th-name">
+                  <span class="th-num">4</span>zipcheck_official
+                </div>
+                <div class="th-text">
+                  도움이 됐으면 인테리어 업체 경험도 후기로 남겨줘. 다른 사람들
+                  업체 고를 때 큰 도움이 되거든. 전체 글:
+                  <a
+                    >https://blog.zcheck.co.kr/interior-company-selection-test/</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

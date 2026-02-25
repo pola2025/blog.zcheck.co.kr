@@ -196,6 +196,11 @@
           <time datetime="2026-02-11T00:00:00.000Z">2026년 2월 11일</time>
         </div>
         <span class="text-gray-300">|</span>
+        <div class="flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          <span id="view-count">&middot;</span>
+        </div>
+        <span class="text-gray-300">|</span>
         <span>집첵 에디터</span>
       </div>
     </div>
@@ -352,6 +357,30 @@
     </div>
   </aside>
   </div>
+
+  <!-- View Count Script -->
+  <script>
+  (function() {
+    var API = 'https://zipcheck-api.zipcheck2025.workers.dev/api/counter';
+    var slug = 'first-home-remodeling';
+    var counted = sessionStorage.getItem('zc_v_' + slug);
+
+    if (counted) {
+      // 이미 카운트 됨 — views 엔드포인트로 현재 값만 조회
+      fetch(API + '/views?slugs=' + slug).then(function(r) { return r.json(); }).then(function(d) {
+        var el = document.getElementById('view-count');
+        if (el && d[slug] != null) el.textContent = d[slug].toLocaleString();
+      }).catch(function() {});
+    } else {
+      // 첫 방문 — view/:slug 로 +1
+      fetch(API + '/view/' + slug).then(function(r) { return r.json(); }).then(function(d) {
+        sessionStorage.setItem('zc_v_' + slug, '1');
+        var el = document.getElementById('view-count');
+        if (el && d.views != null) el.textContent = d.views.toLocaleString();
+      }).catch(function() {});
+    }
+  })();
+  </script>
 
   <!-- Footer -->
   <footer class="bg-gray-900 mt-16">

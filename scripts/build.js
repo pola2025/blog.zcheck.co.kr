@@ -1,8 +1,9 @@
 /**
  * ZCheck Blog 빌드 스크립트
- * content/*.json → dist/{slug}/index.html
+ * 소스: Airtable (primary) + content/*.json (fallback)
+ * 출력: dist/{slug}/index.html
  *
- * 사용법: node scripts/build.js
+ * 사용법: node scripts/build.js [--local-only]
  */
 
 const fs = require('fs');
@@ -13,8 +14,41 @@ const TEMPLATE_DIR = path.join(__dirname, '..', 'templates');
 const DIST_DIR = path.join(__dirname, '..', 'dist');
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
-function build() {
+// GOI 백엔드 API (Airtable 프록시)
+const API_BASE = process.env.BLOG_API_URL || 'https://zipcheck-api.zipcheck2025.workers.dev';
+
+/**
+ * 빌드 후 이미지 검증 - 로컬 /images/ 경로가 dist에 실제 존재하는지 확인
+ * 누락 시 에러 출력 후 process.exit(1)
+ */
+function validateBuild(posts) {
+  const errors = [];
+
+  for (const post of posts) {
+    const heroImg = post.hero_image;
+    if (heroImg && heroImg.startsWith('/images/')) {
+      const distPath = path.join(DIST_DIR, heroImg);
+      if (!fs.existsSync(distPath)) {
+        errors.push(`${post.slug}: ${heroImg} → dist에 파일 없음`);
+      }
+    } else if (!heroImg && post.hero_image_local) {
+      errors.push(`${post.slug}: 히어로 이미지 누락 (hero_image_local: ${post.hero_image_local})`);
+    }
+  }
+
+  if (errors.length > 0) {
+    console.error('\n[BUILD] ✗ 이미지 검증 실패:');
+    for (const e of errors) {
+      console.error(`  - ${e}`);
+    }
+    process.exit(1);
+  }
+  console.log(`[BUILD] ✓ 이미지 검증 통과 (${posts.filter(p => p.hero_image).length}개)`);
+}
+
+async function build() {
   console.log('[BUILD] 시작...');
+  const localOnly = process.argv.includes('--local-only');
 
   // dist 초기화
   if (fs.existsSync(DIST_DIR)) {
@@ -27,9 +61,14 @@ function build() {
     copyDir(PUBLIC_DIR, DIST_DIR);
   }
 
-  // 콘텐츠 로드
-  const posts = loadPosts();
-  console.log(`[BUILD] ${posts.length}개 포스트 발견`);
+  // 콘텐츠 로드: API + 로컬 JSON 병합
+  const localPosts = loadLocalPosts();
+  let apiPosts = [];
+  if (!localOnly) {
+    apiPosts = await loadApiPosts();
+  }
+  const posts = mergePosts(localPosts, apiPosts);
+  console.log(`[BUILD] ${posts.length}개 포스트 (로컬: ${localPosts.length}, API: ${apiPosts.length})`);
 
   // 포스트 템플릿
   const postTemplate = fs.readFileSync(
@@ -54,10 +93,13 @@ function build() {
     'User-agent: *\nAllow: /\nSitemap: https://blog.zcheck.co.kr/sitemap.xml\n',
   );
 
+  // B: 빌드 후 이미지 검증
+  validateBuild(posts);
+
   console.log(`[BUILD] 완료! dist/ 에 ${posts.length}개 포스트 생성됨`);
 }
 
-function loadPosts() {
+function loadLocalPosts() {
   if (!fs.existsSync(CONTENT_DIR)) return [];
 
   const files = fs.readdirSync(CONTENT_DIR).filter((f) => f.endsWith('.json'));
@@ -69,6 +111,7 @@ function loadPosts() {
         fs.readFileSync(path.join(CONTENT_DIR, file), 'utf-8'),
       );
       if (data.published !== false) {
+        data._source = 'local';
         posts.push(data);
       }
     } catch (e) {
@@ -76,11 +119,76 @@ function loadPosts() {
     }
   }
 
-  // 최신 순 정렬
   posts.sort(
     (a, b) => new Date(b.published_at || 0) - new Date(a.published_at || 0),
   );
   return posts;
+}
+
+/**
+ * GOI 공개 API에서 published 포스트를 가져와 빌드 포맷으로 변환
+ */
+async function loadApiPosts() {
+  console.log(`[BUILD] API에서 포스트 로드 중... (${API_BASE})`);
+  const posts = [];
+
+  try {
+    const res = await fetch(`${API_BASE}/api/blog/posts`);
+    if (!res.ok) {
+      console.error(`[BUILD] API 응답 오류: ${res.status}`);
+      return posts;
+    }
+    const data = await res.json();
+    for (const p of data.posts || []) {
+      if (!p.slug || !p.title) continue;
+      posts.push({
+        slug: p.slug,
+        title: p.title,
+        meta_description: p.excerpt || '',
+        category: p.category || '인테리어',
+        tags: p.tags ? p.tags.split(',').map((t) => t.trim()) : (p.tags_array || []),
+        published_at: p.published_date
+          ? new Date(p.published_date.replace(/\./g, '-')).toISOString()
+          : new Date().toISOString(),
+        published: true,
+        _html_content: p.content || '',
+        _source: 'api',
+        hero_image: p.thumbnail_url || '',
+        body_sections: [],
+      });
+    }
+    console.log(`[BUILD] API: ${posts.length}개 포스트 로드`);
+  } catch (e) {
+    console.error(`[BUILD] API 로드 실패: ${e.message}`);
+  }
+  return posts;
+}
+
+/**
+ * 로컬 + Airtable 포스트 병합
+ * 같은 slug가 있으면 로컬 JSON 우선 (body_sections가 더 풍부)
+ * Airtable에만 있는 포스트는 그대로 추가
+ */
+function mergePosts(localPosts, apiPosts) {
+  const slugMap = new Map();
+
+  // 로컬 포스트 먼저 (body_sections가 더 풍부하므로 우선순위 높음)
+  for (const post of localPosts) {
+    slugMap.set(post.slug, post);
+  }
+
+  // API-only 포스트 추가 (로컬에 없는 것만)
+  for (const post of apiPosts) {
+    if (!slugMap.has(post.slug)) {
+      slugMap.set(post.slug, post);
+    }
+  }
+
+  const merged = Array.from(slugMap.values());
+  merged.sort(
+    (a, b) => new Date(b.published_at || 0) - new Date(a.published_at || 0),
+  );
+  return merged;
 }
 
 function buildPost(post, template) {
@@ -88,21 +196,38 @@ function buildPost(post, template) {
   const outDir = path.join(DIST_DIR, slug);
   fs.mkdirSync(outDir, { recursive: true });
 
-  // 이미지 복사
+  // 이미지 복사: hero_image_local → public/images fallback → 경고
+  const imgDir = path.join(DIST_DIR, 'images');
+  fs.mkdirSync(imgDir, { recursive: true });
   if (post.hero_image_local) {
     const src = path.resolve(post.hero_image_local);
+    const dest = path.join(imgDir, `${slug}.png`);
     if (fs.existsSync(src)) {
-      const imgDir = path.join(DIST_DIR, 'images');
-      fs.mkdirSync(imgDir, { recursive: true });
-      const dest = path.join(imgDir, `${slug}.png`);
       fs.copyFileSync(src, dest);
       post.hero_image = `/images/${slug}.png`;
+      // public/images 자동 백업 (다음 빌드 안전망)
+      const publicDest = path.join(PUBLIC_DIR, 'images', `${slug}.png`);
+      if (!fs.existsSync(publicDest)) {
+        fs.mkdirSync(path.join(PUBLIC_DIR, 'images'), { recursive: true });
+        fs.copyFileSync(src, publicDest);
+        console.log(`  [IMAGE] public/images/${slug}.png 자동 백업`);
+      }
+    } else {
+      // A-2: public/images 폴백
+      const fallback = path.join(PUBLIC_DIR, 'images', `${slug}.png`);
+      if (fs.existsSync(fallback)) {
+        fs.copyFileSync(fallback, dest);
+        post.hero_image = `/images/${slug}.png`;
+        console.warn(`  [IMAGE] ⚠ ${slug}: hero_image_local 없음 → public/images 폴백 사용`);
+      } else {
+        console.error(`  [IMAGE] ✗ ${slug}: 히어로 이미지 없음 (hero_image_local: ${post.hero_image_local})`);
+        post._missing_image = true;
+        post.hero_image = '';
+      }
     }
   }
 
   // 본문 내 이미지 복사
-  const imgDir = path.join(DIST_DIR, 'images');
-  fs.mkdirSync(imgDir, { recursive: true });
   for (const section of post.body_sections || []) {
     const localPath = section.local_path || section.path;
     if (section.type === 'image' && localPath) {
@@ -117,8 +242,10 @@ function buildPost(post, template) {
     }
   }
 
-  // 본문 HTML 생성
-  const bodyHtml = buildBodyHtml(post.body_sections || []);
+  // 본문 HTML 생성: Airtable 포스트는 _html_content 사용, 로컬은 body_sections 변환
+  const bodyHtml = post._html_content
+    ? post._html_content
+    : buildBodyHtml(post.body_sections || []);
 
   // 태그 HTML
   const tagsHtml = (post.tags || [])
@@ -346,12 +473,13 @@ function buildIndex(posts) {
         const dateStr = `${pubDate.getFullYear()}.${String(pubDate.getMonth() + 1).padStart(2, '0')}.${String(pubDate.getDate()).padStart(2, '0')}`;
 
         return `
-      <a href="/${esc(post.slug)}/" class="block bg-white rounded-xl border border-gray-200 hover:border-brand-200 hover:shadow-lg transition-all overflow-hidden no-underline group">
+      <a href="/${esc(post.slug)}/" class="block bg-white rounded-xl border border-gray-200 hover:border-brand-200 hover:shadow-lg transition-all overflow-hidden no-underline group" data-slug="${esc(post.slug)}">
         ${post.hero_image ? `<div class="aspect-video overflow-hidden"><img src="${esc(post.hero_image)}" alt="${esc(post.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy"></div>` : '<div class="aspect-video bg-gray-100 flex items-center justify-center"><svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>'}
         <div class="p-4">
           <div class="flex items-center gap-2 text-xs text-gray-500 mb-2.5">
             <span class="bg-brand-50 text-brand-500 px-2 py-0.5 rounded-full font-medium">${esc(post.category || '가이드')}</span>
             <time>${dateStr}</time>
+            <span class="ml-auto flex items-center gap-1 text-gray-400"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg><span class="zc-views-count">&middot;</span></span>
           </div>
           <h2 class="text-base font-bold text-gray-900 group-hover:text-brand-500 transition-colors mb-2 line-clamp-2 leading-snug">${esc(post.title)}</h2>
           <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed">${esc(post.meta_description || '')}</p>
@@ -465,4 +593,7 @@ function esc(text) {
     .replace(/"/g, '&quot;');
 }
 
-build();
+build().catch((err) => {
+  console.error(`[BUILD] 빌드 실패: ${err.message}`);
+  process.exit(1);
+});
