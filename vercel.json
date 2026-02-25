@@ -1,6 +1,10 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "api/cron/auto-generate.js": { "maxDuration": 300 },
+    "api/cron/publish-social.js": { "maxDuration": 300 }
+  },
   "crons": [
     {
       "path": "/api/cron/auto-generate",
