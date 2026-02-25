@@ -1,6 +1,3 @@
-'use strict';
-const fetch = require('node-fetch');
-
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_REPO = 'pola2025/blog.zcheck.co.kr';
