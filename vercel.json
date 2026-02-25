@@ -1,4 +1,19 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "crons": [
+    {
+      "path": "/api/cron/publish-social",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/generate-content",
+      "schedule": "0 12 * * *"
+    }
+  ],
+  "functions": {
+    "api/cron/generate-content.js": {
+      "maxDuration": 60
+    }
+  }
 }
