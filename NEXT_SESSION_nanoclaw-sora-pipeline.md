@@ -73,7 +73,7 @@ NEXT_SESSION_nanoclaw-sora-pipeline.md 참고해서 이어서 진행해줘.
 | image-archive (Windows) | `F:\image-archive\zcheck-blog\`                                 |
 | .env (Mac)              | `/Volumes/Untitled/zcheck-content-pipeline/.env`                |
 | GitHub image-archive    | `https://github.com/pola2025/image-archive.git`                 |
-| GitHub token            | `[REDACTED]`                      |
+| GitHub token            | `[REDACTED - vault에서 확인]`                      |
 
 ## tmux 세션 접속 명령 (Windows Git Bash)
 
