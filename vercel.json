@@ -1,6 +1,7 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [{ "source": "/blog/:path*", "destination": "/:path*" }],
   "functions": {
     "api/cron/auto-generate.js": { "maxDuration": 300 },
     "api/cron/publish-social.js": { "maxDuration": 300 }
