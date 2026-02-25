@@ -64,60 +64,119 @@ async function generateContent(topic) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY 환경변수 없음");
 
-  const prompt = `당신은 한국 인테리어 리모델링 정보 블로그 "집첵"의 콘텐츠 에디터입니다.
-다음 주제로 SEO 최적화된 블로그 포스트를 작성해주세요.
+  const prompt = `당신은 한국 인테리어 리모델링 정보 블로그 "집첵"의 시니어 콘텐츠 에디터입니다.
+실제 인테리어 경험이 풍부한 사람이 쓴 것처럼, 독자에게 직접 말하는 대화체로 작성합니다.
 
 주제: ${topic}
 
-반드시 아래 JSON 형식으로만 응답하세요 (마크다운 없이 순수 JSON):
+## 집첵 서비스 정보
+- 사이트: zcheck.co.kr
+- 핵심 서비스: 인테리어 견적서 1개를 이메일로 받아 48시간 이내 분석
+- 이 서비스를 본문에 1회 자연스럽게 언급 (광고처럼 보이지 않게)
+
+## content_html 작성 규칙 (CRITICAL)
+
+### 어투 규칙 (AI 탐지 우회)
+- 문장 길이 다양화: 짧은 문장(1줄)과 긴 문장(3-4줄)을 반드시 섞을 것
+- 어미 다양화: ~거든요 / ~더라고요 / ~잖아요 / ~인데요 / ~이에요 를 고루 섞을 것
+- 금지 서론: "오늘은 ~에 대해 알아보겠습니다" 절대 금지
+- 금지 결론: "지금까지 ~에 대해 알아보았습니다" 절대 금지
+- 금지 접속사: "따라서", "그러므로", "또한", "게다가", "이러한", "이처럼" 남발 금지
+- 금지 표현: "매우", "굉장히", "정말로" 남발 금지
+- 백과사전체 금지, 친구에게 말하듯 대화체 필수
+- 구체적 수치/경험담 포함, 본문 끝에 독자 질문 1개 포함
+
+### HTML 구조 (집첵 블로그 CSS 컴포넌트 적극 활용)
+반드시 아래 커스텀 컴포넌트를 최소 3종류 이상 사용:
+
+1. 팁 박스:
+<div class="zc-tip"><div class="zc-tip-title">💡 알아두세요</div><p>내용</p></div>
+
+2. 경고 박스:
+<div class="zc-warning"><div class="zc-warning-title">⚠️ 주의</div><p>내용</p></div>
+
+3. 체크리스트:
+<div class="zc-checklist"><div class="zc-checklist-title">✅ 체크리스트 제목</div><ul><li>항목1</li><li>항목2</li></ul></div>
+
+4. 하이라이트:
+<div class="zc-highlight"><p>강조할 핵심 내용</p></div>
+
+5. 단계별 가이드:
+<div class="zc-steps"><div class="zc-step"><div class="zc-step-num">1</div><div class="zc-step-body"><strong>단계 제목</strong><p>설명</p></div></div></div>
+
+6. 콜아웃:
+<div class="zc-callout"><div class="zc-callout-accent"></div><div class="zc-callout-inner"><div class="zc-callout-emoji">💡</div><div class="zc-callout-content"><strong>제목</strong><p>내용</p></div></div></div>
+
+일반 태그: h2, h3, p, ul, li 사용 가능
+마크다운 절대 금지, 순수 HTML만
+
+### 분량 기준
+- 최소 2000자 이상 (HTML 태그 제외 텍스트 기준)
+- h2 소제목 5개 이상
+- 전체 문단 15개 이상
+
+반드시 아래 JSON 형식으로만 응답하세요 (마크다운 코드블록 없이 순수 JSON):
 {
-  "slug": "영문-소문자-하이픈-슬러그-최대5단어",
-  "title": "한글 제목 (35-45자, 숫자 포함 권장)",
+  "slug": "영문-소문자-하이픈-최대5단어",
+  "title": "한글 제목 (35-45자, 숫자나 구체적 표현 포함)",
   "category": "정보 및 참고사항",
-  "excerpt": "150자 이내 요약문 (검색 스니펫용)",
-  "content_html": "완전한 HTML 블로그 본문 (h2, h3, p, ul, li 태그만 사용, 최소 1200자, 집첵 견적서 분석 서비스 zcheck.co.kr 언급 1회 자연스럽게 포함)",
-  "read_time": "5분",
-  "tags": "인테리어,리모델링,주제관련태그1,주제관련태그2,주제관련태그3",
-  "instagram_caption": "인스타그램 캡션 (이모지 적극 활용, 해시태그 7개 이상, 줄바꿈 포함, 250자 이내)",
+  "excerpt": "검색 스니펫용 요약 (120자 이내, 핵심 정보 포함)",
+  "content_html": "(위 규칙 준수한 완전한 HTML 본문)",
+  "read_time": "6분",
+  "tags": "인테리어,리모델링,태그3,태그4,태그5",
+  "instagram_caption": "이모지 포함 캡션\\n\\n핵심 정보 2-3줄\\n\\n#해시태그1 #해시태그2 #해시태그3 #해시태그4 #해시태그5 #해시태그6 #해시태그7 (250자 이내)",
   "threads_chain": [
-    "첫 번째 스레드 (훅 문장, 궁금증 유발, 150자 이내)",
-    "두 번째 스레드 (핵심 정보 2-3가지, 줄바꿈 포함, 200자 이내)",
-    "세 번째 스레드 (CTA - blog.zcheck.co.kr 링크 포함, 100자 이내)"
+    "훅: 독자가 멈추게 만드는 첫 문장. 질문이나 충격적 사실로 시작 (150자 이내)",
+    "핵심 정보 3가지를 번호 매겨서 전달. 줄바꿈 포함 (200자 이내)",
+    "CTA: 더 자세한 내용은 blog.zcheck.co.kr 에서 확인하세요 포함 (100자 이내)"
   ]
 }
 
-작성 규칙:
-- content_html: 실제 HTML 태그만, 마크다운 절대 금지
-- category는 반드시 "정보 및 참고사항" 또는 "피해예방" 중 하나
-- slug: 영문 소문자와 하이픈만 사용
-- 인테리어 실용 정보 중심, 초보자도 이해하기 쉽게`;
+category는 반드시 "정보 및 참고사항" 또는 "피해예방" 중 하나`;
 
-  const res = await fetch(
-    `${GEMINI_API}/${GEMINI_TEXT_MODEL}:generateContent?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          response_mime_type: "application/json",
-          temperature: 0.85,
-          maxOutputTokens: 8192,
-        },
-      }),
-    },
-  );
+  // 최대 2번 시도 (품질 미달 시 재시도)
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const res = await fetch(
+      `${GEMINI_API}/${GEMINI_TEXT_MODEL}:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            response_mime_type: "application/json",
+            temperature: attempt === 1 ? 0.9 : 1.0,
+            maxOutputTokens: 16384,
+          },
+        }),
+      },
+    );
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Gemini 텍스트 생성 실패 (${res.status}): ${err}`);
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Gemini 텍스트 생성 실패 (${res.status}): ${err}`);
+    }
+
+    const data = await res.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error("Gemini 응답에 텍스트 없음");
+
+    const parsed = JSON.parse(text);
+
+    // 품질 검증: content_html 텍스트 길이 체크 (HTML 태그 제거 후)
+    const textOnly = (parsed.content_html || "").replace(/<[^>]+>/g, "").trim();
+    if (textOnly.length >= 1500) {
+      return parsed; // 품질 통과
+    }
+    if (attempt === 1) {
+      console.warn(`[AUTO-GEN] 1차 생성 텍스트 ${textOnly.length}자 - 재시도`);
+    } else {
+      console.warn(
+        `[AUTO-GEN] 2차 생성 텍스트 ${textOnly.length}자 - 그대로 사용`,
+      );
+      return parsed;
+    }
   }
-
-  const data = await res.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error("Gemini 응답에 텍스트 없음");
-
-  return JSON.parse(text);
 }
 
 /**
