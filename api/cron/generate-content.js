@@ -244,7 +244,7 @@ module.exports = async function handler(req, res) {
     let imageStatus = 'skipped';
     try {
       const imageBase64 = await generateHeroImage(topic.slug);
-      const imagePath = `public/images/${topic.slug}.png`;
+      const imagePath = `images/${topic.slug}.png`;
       await pushFileToGitHub(
         imagePath,
         imageBase64,
@@ -256,6 +256,21 @@ module.exports = async function handler(req, res) {
       console.error('Image generation failed:', imgErr.message);
       imageStatus = `failed: ${imgErr.message}`;
     }
+
+    // Push schedule file for publish-social cron
+    const schedData = {
+      slug: topic.slug,
+      title: contentJSON.title || topic.keyword,
+      schedule_date: tomorrowDate + ' 09:00',
+      hero_image: '/images/' + topic.slug + '.png',
+      instagram_caption: contentJSON.instagram_caption || '',
+      threads_chain: contentJSON.threads_chain || [],
+    };
+    await pushFileToGitHub(
+      'schedule/' + topic.slug + '.json',
+      JSON.stringify(schedData, null, 2),
+      'schedule: ' + tomorrowDate + ' - ' + topic.slug
+    );
 
     const postUrl = `${BLOG_BASE}/${topic.slug}/`;
     await sendTelegram(
