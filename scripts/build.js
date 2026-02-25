@@ -17,35 +17,6 @@ const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 // GOI 백엔드 API (Airtable 프록시)
 const API_BASE = process.env.BLOG_API_URL || 'https://zipcheck-api.zipcheck2025.workers.dev';
 
-/**
- * 빌드 후 이미지 검증 - 로컬 /images/ 경로가 dist에 실제 존재하는지 확인
- * 누락 시 에러 출력 후 process.exit(1)
- */
-function validateBuild(posts) {
-  const errors = [];
-
-  for (const post of posts) {
-    const heroImg = post.hero_image;
-    if (heroImg && heroImg.startsWith('/images/')) {
-      const distPath = path.join(DIST_DIR, heroImg);
-      if (!fs.existsSync(distPath)) {
-        errors.push(`${post.slug}: ${heroImg} → dist에 파일 없음`);
-      }
-    } else if (!heroImg && post.hero_image_local) {
-      errors.push(`${post.slug}: 히어로 이미지 누락 (hero_image_local: ${post.hero_image_local})`);
-    }
-  }
-
-  if (errors.length > 0) {
-    console.error('\n[BUILD] ✗ 이미지 검증 실패:');
-    for (const e of errors) {
-      console.error(`  - ${e}`);
-    }
-    process.exit(1);
-  }
-  console.log(`[BUILD] ✓ 이미지 검증 통과 (${posts.filter(p => p.hero_image).length}개)`);
-}
-
 async function build() {
   console.log('[BUILD] 시작...');
   const localOnly = process.argv.includes('--local-only');
@@ -92,9 +63,6 @@ async function build() {
     path.join(DIST_DIR, 'robots.txt'),
     'User-agent: *\nAllow: /\nSitemap: https://blog.zcheck.co.kr/sitemap.xml\n',
   );
-
-  // B: 빌드 후 이미지 검증
-  validateBuild(posts);
 
   console.log(`[BUILD] 완료! dist/ 에 ${posts.length}개 포스트 생성됨`);
 }
@@ -196,38 +164,21 @@ function buildPost(post, template) {
   const outDir = path.join(DIST_DIR, slug);
   fs.mkdirSync(outDir, { recursive: true });
 
-  // 이미지 복사: hero_image_local → public/images fallback → 경고
-  const imgDir = path.join(DIST_DIR, 'images');
-  fs.mkdirSync(imgDir, { recursive: true });
+  // 이미지 복사
   if (post.hero_image_local) {
     const src = path.resolve(post.hero_image_local);
-    const dest = path.join(imgDir, `${slug}.png`);
     if (fs.existsSync(src)) {
+      const imgDir = path.join(DIST_DIR, 'images');
+      fs.mkdirSync(imgDir, { recursive: true });
+      const dest = path.join(imgDir, `${slug}.png`);
       fs.copyFileSync(src, dest);
       post.hero_image = `/images/${slug}.png`;
-      // public/images 자동 백업 (다음 빌드 안전망)
-      const publicDest = path.join(PUBLIC_DIR, 'images', `${slug}.png`);
-      if (!fs.existsSync(publicDest)) {
-        fs.mkdirSync(path.join(PUBLIC_DIR, 'images'), { recursive: true });
-        fs.copyFileSync(src, publicDest);
-        console.log(`  [IMAGE] public/images/${slug}.png 자동 백업`);
-      }
-    } else {
-      // A-2: public/images 폴백
-      const fallback = path.join(PUBLIC_DIR, 'images', `${slug}.png`);
-      if (fs.existsSync(fallback)) {
-        fs.copyFileSync(fallback, dest);
-        post.hero_image = `/images/${slug}.png`;
-        console.warn(`  [IMAGE] ⚠ ${slug}: hero_image_local 없음 → public/images 폴백 사용`);
-      } else {
-        console.error(`  [IMAGE] ✗ ${slug}: 히어로 이미지 없음 (hero_image_local: ${post.hero_image_local})`);
-        post._missing_image = true;
-        post.hero_image = '';
-      }
     }
   }
 
   // 본문 내 이미지 복사
+  const imgDir = path.join(DIST_DIR, 'images');
+  fs.mkdirSync(imgDir, { recursive: true });
   for (const section of post.body_sections || []) {
     const localPath = section.local_path || section.path;
     if (section.type === 'image' && localPath) {

@@ -46,7 +46,14 @@ function deploy() {
         path: '/api/cron/publish-social',
         schedule: '0 0 * * *',
       },
+      {
+        path: '/api/cron/generate-content',
+        schedule: '0 12 * * *',
+      },
     ],
+    functions: {
+      'api/cron/generate-content.js': { maxDuration: 60 },
+    },
   };
   fs.writeFileSync(
     path.join(DIST, 'vercel.json'),
