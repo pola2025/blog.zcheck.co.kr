@@ -1,4 +1,14 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "crons": [
+    {
+      "path": "/api/cron/auto-generate",
+      "schedule": "0 21 * * *"
+    },
+    {
+      "path": "/api/cron/publish-social",
+      "schedule": "0 0 * * *"
+    }
+  ]
 }
