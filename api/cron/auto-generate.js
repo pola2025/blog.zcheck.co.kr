@@ -19,7 +19,7 @@
  */
 
 const WORKERS_BASE = "https://zipcheck-api.zipcheck2025.workers.dev";
-const GEMINI_TEXT_MODEL = "gemini-2.5-flash";
+const GEMINI_TEXT_MODEL = "gemini-3-pro-preview";
 const GEMINI_IMAGE_MODEL = "gemini-3-pro-image-preview";
 const GEMINI_API = "https://generativelanguage.googleapis.com/v1beta/models";
 
