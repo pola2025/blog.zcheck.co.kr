@@ -144,7 +144,7 @@ category는 반드시 "정보 및 참고사항" 또는 "피해예방" 중 하나
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            response_mime_type: "application/json",
+            responseMimeType: "application/json",
             temperature: attempt === 1 ? 0.9 : 1.0,
             maxOutputTokens: 16384,
           },

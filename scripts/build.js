@@ -95,6 +95,10 @@ function loadLocalPosts() {
       );
       if (data.published !== false) {
         data._source = 'local';
+        // content_html → _html_content 매핑 (auto-generate 방식 지원)
+        if (data.content_html && !data._html_content) {
+          data._html_content = data.content_html;
+        }
         posts.push(data);
       }
     } catch (e) {

@@ -129,62 +129,72 @@ async function generateContentJSON(topic, tomorrowDate) {
   const prompt = `당신은 한국 인테리어 리모델링 정보 블로그 "집첵"의 시니어 콘텐츠 에디터입니다.
 실제 인테리어 경험이 풍부한 사람이 쓴 것처럼, 독자에게 직접 말하는 대화체로 작성합니다.
 
-키워드: ${topic.keyword}
-슬러그: ${topic.slug}
-발행일: ${tomorrowDate}
+주제: ${topic.keyword}
 
 ## 집첵 서비스 정보
 - 사이트: zcheck.co.kr
 - 핵심 서비스: 인테리어 견적서 1개를 이메일로 받아 48시간 이내 분석
-- 본문 마지막 섹션에 1회 자연스럽게 언급 (광고처럼 보이지 않게)
+- 이 서비스를 본문에 1회 자연스럽게 언급 (광고처럼 보이지 않게)
 
-## 어투 규칙 (CRITICAL)
-- 문장 길이 다양화: 짧은 문장(1-2줄)과 긴 문장(4-5줄)을 반드시 섞을 것
+## content_html 작성 규칙 (CRITICAL)
+
+### 어투 규칙 (AI 탐지 우회)
+- 문장 길이 다양화: 짧은 문장(1줄)과 긴 문장(3-4줄)을 반드시 섞을 것
 - 어미 다양화: ~거든요 / ~더라고요 / ~잖아요 / ~인데요 / ~이에요 를 고루 섞을 것
-- 줄바꿈: 20-25자 단위로 줄바꿈 (\\n 사용)
 - 금지 서론: "오늘은 ~에 대해 알아보겠습니다" 절대 금지
 - 금지 결론: "지금까지 ~에 대해 알아보았습니다" 절대 금지
 - 금지 접속사: "따라서", "그러므로", "또한", "게다가", "이러한", "이처럼" 남발 금지
+- 금지 표현: "매우", "굉장히", "정말로" 남발 금지
 - 백과사전체 금지, 친구에게 말하듯 대화체 필수
-- 구체적 수치(비용, 기간, 치수 등) 반드시 포함
+- 구체적 수치/경험담 포함, 본문 끝에 독자 질문 1개 포함
 
-## body_sections 분량 기준 (CRITICAL)
-- 전체 text 섹션 content 합계: 최소 1500자 이상
-- text 섹션 하나당: 최소 5-8문장, 150자 이상
-- text 섹션 최소 8개 이상, callout 섹션 최소 3개 이상
-- 핵심 포인트를 5개 이상 상세하게 다룰 것
+### HTML 구조 (집첵 블로그 CSS 컴포넌트 적극 활용)
+반드시 아래 커스텀 컴포넌트를 최소 3종류 이상 사용:
 
-반드시 아래 JSON 형식으로만 응답하세요. JSON 외 텍스트나 마크다운 코드블록은 절대 포함하지 마세요:
+1. 팁 박스:
+<div class="zc-tip"><div class="zc-tip-title">💡 알아두세요</div><p>내용</p></div>
 
+2. 경고 박스:
+<div class="zc-warning"><div class="zc-warning-title">⚠️ 주의</div><p>내용</p></div>
+
+3. 체크리스트:
+<div class="zc-checklist"><div class="zc-checklist-title">✅ 체크리스트 제목</div><ul><li>항목1</li><li>항목2</li></ul></div>
+
+4. 하이라이트:
+<div class="zc-highlight"><p>강조할 핵심 내용</p></div>
+
+5. 단계별 가이드:
+<div class="zc-steps"><div class="zc-step"><div class="zc-step-num">1</div><div class="zc-step-body"><strong>단계 제목</strong><p>설명</p></div></div></div>
+
+6. 콜아웃:
+<div class="zc-callout"><div class="zc-callout-accent"></div><div class="zc-callout-inner"><div class="zc-callout-emoji">💡</div><div class="zc-callout-content"><strong>제목</strong><p>내용</p></div></div></div>
+
+일반 태그: h2, h3, p, ul, li 사용 가능
+마크다운 절대 금지, 순수 HTML만
+
+### 분량 기준
+- 최소 2000자 이상 (HTML 태그 제외 텍스트 기준)
+- h2 소제목 5개 이상
+- 전체 문단 15개 이상
+
+반드시 아래 JSON 형식으로만 응답하세요:
 {
   "slug": "${topic.slug}",
-  "title": "(SEO 최적화 제목, 25-40자, 숫자나 구체적 표현 포함)",
-  "meta_description": "(검색 스니펫용 설명, 120자 이내, 핵심 정보 포함)",
+  "title": "한글 제목 (35-45자, 숫자나 구체적 표현 포함)",
+  "meta_description": "검색 스니펫용 요약 (120자 이내, 핵심 정보 포함)",
   "category": "인테리어",
   "target_keyword": "${topic.keyword}",
   "tags": ["태그1", "태그2", "태그3", "태그4", "태그5"],
   "published_at": "${tomorrowDate}T09:00:00.000Z",
   "published": true,
   "hero_image": "/images/${topic.slug}.png",
-  "body_sections": [
-    {"type": "text", "content": "(섹션1: 공감형 도입부, 5-7문장, 20-25자 줄바꿈)"},
-    {"type": "text", "content": "(섹션2: 핵심 포인트1 상세, 5-7문장, 구체적 수치 포함)"},
-    {"type": "callout", "emoji": "💡", "title": "(포인트1 핵심 한 줄)", "content": "(실용 팁 2-3문장)"},
-    {"type": "text", "content": "(섹션4: 핵심 포인트2 상세, 5-7문장)"},
-    {"type": "callout", "emoji": "⚠️", "title": "(주의사항 제목)", "content": "(주의할 점 2-3문장)"},
-    {"type": "text", "content": "(섹션6: 핵심 포인트3 상세, 5-7문장)"},
-    {"type": "callout", "emoji": "💡", "title": "(포인트3 실용 팁 제목)", "content": "(팁 2-3문장)"},
-    {"type": "text", "content": "(섹션8: 핵심 포인트4 상세, 5-7문장)"},
-    {"type": "callout", "emoji": "✅", "title": "(체크리스트 또는 요약 제목)", "content": "(2-4문장)"},
-    {"type": "text", "content": "(섹션10: 핵심 포인트5 또는 심화 정보, 5-7문장)"},
-    {"type": "text", "content": "(섹션11: 마무리, 집첵 서비스 자연스럽게 1회 언급, 3-5문장)"}
-  ],
-  "instagram_caption": "(이모지 포함 캡션\\n\\n핵심 팁 4-5개 나열\\n\\n#해시태그1 #해시태그2 #해시태그3 #해시태그4 #해시태그5 #해시태그6 #해시태그7 #해시태그8, 250자 이내)",
+  "content_html": "(위 규칙 준수한 완전한 HTML 본문)",
+  "read_time": "6분",
+  "instagram_caption": "이모지 포함 캡션\\n\\n핵심 정보 2-3줄\\n\\n#해시태그1 #해시태그2 #해시태그3 #해시태그4 #해시태그5 #해시태그6 #해시태그7 (250자 이내)",
   "threads_chain": [
-    "(첫 포스트: 독자가 멈추게 만드는 후킹 문장, 150자 이내)",
-    "(두 번째: 핵심 팁 3-4가지 번호 매겨서, 200자 이내)",
-    "(세 번째: 추가 실용 정보, 150자 이내)",
-    "(네 번째: CTA - blog.zcheck.co.kr/${topic.slug}/ 링크 포함, 100자 이내)"
+    "훅: 독자가 멈추게 만드는 첫 문장. 질문이나 충격적 사실로 시작 (150자 이내)",
+    "핵심 정보 3가지를 번호 매겨서 전달. 줄바꿈 포함 (200자 이내)",
+    "CTA: 더 자세한 내용은 blog.zcheck.co.kr 에서 확인하세요 포함 (100자 이내)"
   ]
 }`;
 
@@ -222,16 +232,13 @@ async function generateContentJSON(topic, tomorrowDate) {
       throw new Error(`JSON 파싱 실패: ${parseErr.message}`);
     }
 
-    // 품질 검증: text 섹션 전체 글자 수
-    const totalText = (parsed.body_sections || [])
-      .filter((s) => s.type === "text")
-      .map((s) => s.content || "")
-      .join("");
-    if (totalText.length >= 1000) return parsed;
+    // 품질 검증: content_html 텍스트 길이 (HTML 태그 제거 후)
+    const textOnly = (parsed.content_html || "").replace(/<[^>]+>/g, "").trim();
+    if (textOnly.length >= 1500) return parsed;
     if (attempt === 1) {
-      console.warn(`[GEN] 1차 생성 ${totalText.length}자 - 재시도`);
+      console.warn(`[GEN] 1차 생성 ${textOnly.length}자 - 재시도`);
     } else {
-      console.warn(`[GEN] 2차 생성 ${totalText.length}자 - 그대로 사용`);
+      console.warn(`[GEN] 2차 생성 ${textOnly.length}자 - 그대로 사용`);
       return parsed;
     }
   }
