@@ -13,6 +13,7 @@ const CONTENT_DIR = path.join(__dirname, '..', 'content');
 const TEMPLATE_DIR = path.join(__dirname, '..', 'templates');
 const DIST_DIR = path.join(__dirname, '..', 'dist');
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+const IMAGES_DIR = path.join(__dirname, '..', 'images');
 
 // GOI 백엔드 API (Airtable 프록시)
 const API_BASE = process.env.BLOG_API_URL || 'https://zipcheck-api.zipcheck2025.workers.dev';
@@ -30,6 +31,20 @@ async function build() {
   // public 복사
   if (fs.existsSync(PUBLIC_DIR)) {
     copyDir(PUBLIC_DIR, DIST_DIR);
+  }
+
+  // Cron 생성 이미지 복사 (root images/ → dist/images/)
+  if (fs.existsSync(IMAGES_DIR)) {
+    const distImgDir = path.join(DIST_DIR, 'images');
+    fs.mkdirSync(distImgDir, { recursive: true });
+    for (const f of fs.readdirSync(IMAGES_DIR)) {
+      if (/\.(png|jpg|jpeg|webp|gif)$/i.test(f)) {
+        const destPath = path.join(distImgDir, f);
+        if (!fs.existsSync(destPath)) {
+          fs.copyFileSync(path.join(IMAGES_DIR, f), destPath);
+        }
+      }
+    }
   }
 
   // 콘텐츠 로드: API + 로컬 JSON 병합

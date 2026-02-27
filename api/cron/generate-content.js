@@ -197,6 +197,7 @@ async function generateContentJSON(topic, tomorrowDate) {
         generationConfig: {
           temperature: attempt === 1 ? 0.9 : 1.0,
           maxOutputTokens: 16384,
+          responseMimeType: "application/json",
         },
       }),
     });
@@ -210,7 +211,16 @@ async function generateContentJSON(topic, tomorrowDate) {
       .replace(/^```json\s*/i, "")
       .replace(/```\s*$/, "")
       .trim();
-    const parsed = JSON.parse(cleaned);
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (parseErr) {
+      console.error(
+        `[GEN] JSON 파싱 실패 (attempt ${attempt}): ${parseErr.message}`,
+      );
+      if (attempt < 2) continue;
+      throw new Error(`JSON 파싱 실패: ${parseErr.message}`);
+    }
 
     // 품질 검증: text 섹션 전체 글자 수
     const totalText = (parsed.body_sections || [])
