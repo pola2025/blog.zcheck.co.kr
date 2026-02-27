@@ -4,7 +4,7 @@
  * 매일 21:00 UTC (06:00 KST) 실행
  * 1. Workers KV에서 오늘 주제 꺼내기
  * 2. Gemini → 블로그 콘텐츠 JSON 생성
- * 3. Gemini → hero 이미지 생성 (base64)
+ * 3. GitHub 아카이브에서 이미지 가져오기 (Gemini 생성 제거)
  * 4. Workers /api/cron/images/upload → R2 저장 → URL 반환
  * 5. Workers /api/cron/posts → Airtable 저장
  * 6. Workers /api/cron/today → slug + 소셜 데이터 KV 저장
@@ -18,9 +18,14 @@
  *   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
  */
 
+const {
+  getUnusedImage,
+  downloadArchiveImage,
+  markImageUsed,
+} = require("../lib/image-archive");
+
 const WORKERS_BASE = "https://zipcheck-api.zipcheck2025.workers.dev";
-const GEMINI_TEXT_MODEL = "gemini-3-pro-preview";
-const GEMINI_IMAGE_MODEL = "gemini-3-pro-image-preview";
+const GEMINI_TEXT_MODEL = "gemini-3.1-pro-preview";
 const GEMINI_API = "https://generativelanguage.googleapis.com/v1beta/models";
 
 function sleep(ms) {
@@ -180,57 +185,26 @@ category는 반드시 "정보 및 참고사항" 또는 "피해예방" 중 하나
 }
 
 /**
- * Gemini 이미지 생성 → base64 반환
+ * GitHub 아카이브에서 이미지 가져오기
+ * @returns {{ imageBase64, mimeType, archiveImageId }}
  */
-async function generateImage(title, slug) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("GEMINI_API_KEY 환경변수 없음");
+async function getArchiveImage() {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) throw new Error("GITHUB_TOKEN 환경변수 없음");
 
-  const imagePrompt = `Create a professional Korean interior design blog hero image.
-Topic: "${title}"
+  const image = await getUnusedImage(token, "blog");
+  if (!image) throw new Error("아카이브에 사용 가능한 이미지 없음");
 
-Style requirements:
-- Clean, modern Korean apartment interior photography style
-- Bright, airy space with abundant natural light from windows
-- Include tropical plant decoration (monstera deliciosa, bird of paradise, or sansevieria)
-- Professional real estate photography quality, warm neutral tones
-- Modern Korean apartment aesthetic with clean lines
-- No text overlays, no people, no faces
-- Horizontal landscape orientation (16:9 ratio)
-- High quality, suitable for blog header image`;
-
-  const res = await fetch(
-    `${GEMINI_API}/${GEMINI_IMAGE_MODEL}:generateContent?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: imagePrompt }] }],
-        generationConfig: {
-          responseModalities: ["IMAGE", "TEXT"],
-        },
-      }),
-    },
+  console.log(`[ARCHIVE] 선택: ${image.filename} (id: ${image.id})`);
+  const { base64, mimeType } = await downloadArchiveImage(
+    token,
+    image.filename,
+  );
+  console.log(
+    `[ARCHIVE] 다운로드 완료: ${(Buffer.from(base64, "base64").length / 1024).toFixed(1)}KB`,
   );
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Gemini 이미지 생성 실패 (${res.status}): ${err}`);
-  }
-
-  const data = await res.json();
-  const parts = data?.candidates?.[0]?.content?.parts || [];
-
-  for (const part of parts) {
-    if (part.inlineData?.data) {
-      return {
-        imageBase64: part.inlineData.data,
-        mimeType: part.inlineData.mimeType || "image/png",
-      };
-    }
-  }
-
-  throw new Error("Gemini 이미지 응답에 inlineData 없음");
+  return { imageBase64: base64, mimeType, archiveImageId: image.id };
 }
 
 /**
@@ -370,10 +344,10 @@ module.exports = async function handler(req, res) {
     } = content;
     logs.push(`생성 완료: ${slug} - ${title}`);
 
-    // 3. Gemini 이미지 생성
-    logs.push("Gemini 이미지 생성 중...");
-    const { imageBase64, mimeType } = await generateImage(title, slug);
-    logs.push("이미지 생성 완료");
+    // 3. GitHub 아카이브에서 이미지 가져오기
+    logs.push("아카이브 이미지 가져오기...");
+    const { imageBase64, mimeType, archiveImageId } = await getArchiveImage();
+    logs.push("아카이브 이미지 다운로드 완료");
 
     // 4. Workers R2에 이미지 업로드
     logs.push("이미지 R2 업로드 중...");
@@ -381,6 +355,13 @@ module.exports = async function handler(req, res) {
     const thumbnailUrl = imageResult.url;
     const thumbnailKey = imageResult.key;
     logs.push(`이미지 업로드 완료: ${thumbnailUrl}`);
+
+    // 4-1. 아카이브 사용 마킹
+    try {
+      await markImageUsed(process.env.GITHUB_TOKEN, archiveImageId, "blog");
+    } catch (e) {
+      console.warn("[ARCHIVE] 사용 마킹 실패 (무시):", e.message);
+    }
 
     // 5. Workers Airtable에 포스트 생성
     logs.push("Airtable 포스트 생성 중...");
